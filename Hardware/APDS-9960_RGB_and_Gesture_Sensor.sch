@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -19518,6 +19518,7 @@ This is the mechanical footprint for a #4 phillips button head screw. Use the ke
 <text x="238.76" y="7.62" size="2.54" layer="94">v01</text>
 <text x="172.72" y="12.7" size="2.54" layer="94" align="center-left">Shawn Hymel</text>
 <rectangle x1="79.502" y1="118.872" x2="83.058" y2="119.888" layer="94"/>
+<text x="185.42" y="132.08" size="2.54" layer="94">I2C Addr: 0x39</text>
 </plain>
 <instances>
 <instance part="FRAME1" gate="G$1" x="0" y="0"/>
@@ -19538,10 +19539,10 @@ This is the mechanical footprint for a #4 phillips button head screw. Use the ke
 <instance part="GND3" gate="1" x="182.88" y="83.82"/>
 <instance part="GND4" gate="1" x="142.24" y="109.22"/>
 <instance part="SUPPLY4" gate="G$1" x="142.24" y="127"/>
-<instance part="FID1" gate="G$1" x="236.22" y="33.02"/>
-<instance part="FID2" gate="G$1" x="236.22" y="27.94"/>
-<instance part="STANDOFF1" gate="G$1" x="231.14" y="33.02"/>
-<instance part="STANDOFF2" gate="G$1" x="231.14" y="27.94"/>
+<instance part="FID1" gate="G$1" x="246.38" y="33.02"/>
+<instance part="FID2" gate="G$1" x="246.38" y="27.94"/>
+<instance part="STANDOFF1" gate="G$1" x="241.3" y="33.02"/>
+<instance part="STANDOFF2" gate="G$1" x="241.3" y="27.94"/>
 <instance part="U$1" gate="G$1" x="190.5" y="38.1"/>
 <instance part="LOGO1" gate="G$1" x="132.08" y="20.32"/>
 <instance part="LOGO2" gate="G$1" x="134.62" y="10.16"/>
