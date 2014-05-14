@@ -20787,11 +20787,11 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <text x="238.76" y="7.62" size="2.54" layer="94">v02</text>
 <text x="172.72" y="12.7" size="2.54" layer="94" align="center-left">Shawn Hymel</text>
 <rectangle x1="69.342" y1="116.332" x2="72.898" y2="117.348" layer="94"/>
-<text x="175.26" y="134.62" size="2.54" layer="94">I2C Addr: 0x39</text>
+<text x="177.8" y="127" size="1.778" layer="94">I2C Addr: 0x39</text>
 <rectangle x1="141.732" y1="107.95" x2="142.748" y2="110.49" layer="94"/>
-<text x="73.66" y="119.38" size="2.54" layer="94">I2C Pullup
+<text x="73.66" y="119.38" size="1.524" layer="94" font="vector">I2C Pullup
 Enable</text>
-<text x="139.7" y="114.3" size="2.54" layer="94" align="center-right">Connect
+<text x="139.7" y="114.3" size="1.778" layer="94" align="center-right">Connect
 Power Supplies</text>
 </plain>
 <instances>
