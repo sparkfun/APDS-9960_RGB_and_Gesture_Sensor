@@ -23,7 +23,7 @@ IMPORTANT: The APDS-9960 can only accept 3.3V!
  2            INT              Interrupt
 
 Resources:
-Include SFE_APDS-9960.h
+Include Wire.h and SFE_APDS-9960.h
 
 Development environment specifics:
 Written in Arduino 1.0.5
