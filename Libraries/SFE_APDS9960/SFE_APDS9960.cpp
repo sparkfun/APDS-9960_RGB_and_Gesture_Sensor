@@ -39,17 +39,152 @@ SFE_APDS9960::~SFE_APDS9960()
  */
 bool SFE_APDS9960::init()
 {
+    uint8_t id;
 
- /* Initialize I2C */
- Wire.begin();
- 
- /* Read ID register and check against known values for APDS-9960 */
- 
- /* Set ENABLE register to 0 (disable all features) */
- 
- /* Set default values for registers */
- 
- return true;
+    /* Initialize I2C */
+    Wire.begin();
+     
+    /* Read ID register and check against known values for APDS-9960 */
+    if( !wireReadDataByte(APDS9960_ID, id) ) {
+        return false;
+    }
+    if( !(id == APDS9960_ID_1 || id == APDS9960_ID_2) ) {
+        return false;
+    }
+     
+    /* Set ENABLE register to 0 (disable all features) */
+    if( !setMode(ALL, OFF) ) {
+        return false;
+    }
+    
+    /* Set default values for registers */
+    if( !wireWriteDataByte(APDS9960_ATIME, DEFAULT_ATIME) ) {
+        return false;
+    }
+    if( !wireWriteDataByte(APDS9960_WTIME, DEFAULT_WTIME) ) {
+        return false;
+    }
+    if( !wireWriteDataByte(APDS9960_PPULSE, DEFAULT_PPULSE) ) {
+        return false;
+    }
+    if( !wireWriteDataByte(APDS9960_POFFSET_UR, DEFAULT_POFFSET_UR) ) {
+        return false;
+    }
+    if( !wireWriteDataByte(APDS9960_POFFSET_DL, DEFAULT_POFFSET_DL) ) {
+        return false;
+    }
+    if( !wireWriteDataByte(APDS9960_CONFIG1, DEFAULT_CONFIG1) ) {
+        return false;
+    }
+    // ***SET LDRIVE, PGAIN, AGAIN
+    
+    
+    return true;
+}
+
+/**
+ * @brief Reads and returns the contents of the ENABLE register
+ *
+ * @return Contents of the ENABLE register. 0xFF if error.
+ */
+uint8_t SFE_APDS9960::getMode()
+{
+    uint8_t enable_value;
+    
+    /* Read current ENABLE register */
+    if( !wireReadDataByte(APDS9960_ENABLE, enable_value) ) {
+        return 0xFF;
+    }
+    
+    return enable_value;
+}
+
+/**
+ * @brief Enables or disables a feature in the APDS-9960
+ *
+ * @param[in] mode which feature to enable
+ * @param[in] enable ON (1) or OFF (0)
+ * @return True if operation success. False otherwise.
+ */
+bool SFE_APDS9960::setMode(uint8_t mode, uint8_t enable)
+{
+    uint8_t reg_val;
+
+    /* Read current ENABLE register */
+    reg_val = getMode();
+    if( reg_val == 0xFF ) {
+        return false;
+    }
+    
+    /* Change bit(s) in ENABLE register */
+    enable = enable & 0x01;
+    if( mode >= 0 && mode <= 6 ) {
+        if (enable) {
+            reg_val |= (1 << mode);
+        } else {
+            reg_val &= ~(1 << mode);
+        }
+    } else if( mode == ALL ) {
+        if (enable) {
+            reg_val = 0x7F;
+        } else {
+            reg_val = 0x00;
+        }
+    }
+        
+    /* Write value back to ENABLE register */
+    if( !wireWriteDataByte(APDS9960_ENABLE, reg_val) ) {
+        return false;
+    }
+        
+    return true;
+}
+
+/**
+ *
+ */
+uint8_t SFE_APDS9960::getLDrive()
+{
+
+}
+
+/**
+ *
+ */
+bool SFE_APDS9960::setLDrive(uint8_t)
+{
+
+}
+
+/**
+ *
+ */
+uint8_t SFE_APDS9960::getPGain()
+{
+
+}
+
+/**
+ *
+ */
+bool SFE_APDS9960::setPGain(uint8_t)
+{
+
+}
+
+/**
+ *
+ */
+uint8_t SFE_APDS9960::getAGain()
+{
+
+}
+
+/**
+ *
+ */
+bool SFE_APDS9960::setAGain(uint8_t)
+{
 
 }
 

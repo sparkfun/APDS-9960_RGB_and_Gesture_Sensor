@@ -19,6 +19,10 @@
 /* APDS-9960 I2C address */
 #define APDS9960_I2C_ADDR       0x39
 
+/* Acceptable device IDs */
+#define APDS9960_ID_1           0xAB
+#define APDS9960_ID_2           0x9C
+
 /* APDS-9960 register addresses */
 #define APDS9960_ENABLE         0x80
 #define APDS9960_ATIME          0x81
@@ -68,14 +72,51 @@
 #define APDS9960_GFIFO_U        0xFC
 #define APDS9960_GFIFO_D        0xFD
 #define APDS9960_GFIFO_L        0xFE
-#define APDS9960_GFIFO_R        0xFF    
+#define APDS9960_GFIFO_R        0xFF
+
+/* On/Off definitions */
+#define OFF                     0
+#define ON                      1
+
+/* Acceptable parameters for setMode */
+#define POWER                   0
+#define AMBIENT_LIGHT           1
+#define PROXIMITY               2
+#define WAIT                    3
+#define AMBIENT_LIGHT_INT       4
+#define PROXIMITY_INT           5
+#define GESTURE                 6
+#define ALL                     7
+
+/* Default values */
+#define DEFAULT_ATIME           219     // 103ms
+#define DEFAULT_WTIME           246     // 27ms
+#define DEFAULT_PPULSE          0x87    // 16us, 8 pulses
+#define DEFAULT_POFFSET_UR      0       // 0 offset
+#define DEFAULT_POFFSET_DL      0       // 0 offset      
+#define DEFAULT_CONFIG1         0x60    // No 12x wait (WTIME) factor
+  
 
 /* APDS9960 Class */
 class SFE_APDS9960 {
 public:
     SFE_APDS9960();
     ~SFE_APDS9960();
+    
+    /* Initialization and enable */
     bool init();
+    uint8_t getMode();
+    bool setMode(uint8_t mode, uint8_t enable);
+    
+    /* Parameter control methods */
+    uint8_t getLDrive();
+    bool setLDrive(uint8_t);
+    uint8_t getPGain();
+    bool setPGain(uint8_t);
+    uint8_t getAGain();
+    bool setAGain(uint8_t);
+    
+    /* Raw I2C Commansd */
     bool wireWriteByte(uint8_t val);
     bool wireWriteDataByte(uint8_t reg, uint8_t val);
     bool wireWriteDataBlock(uint8_t reg, uint8_t *val, unsigned int len);
