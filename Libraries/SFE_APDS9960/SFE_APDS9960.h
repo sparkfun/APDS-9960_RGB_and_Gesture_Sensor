@@ -19,6 +19,9 @@
 /* APDS-9960 I2C address */
 #define APDS9960_I2C_ADDR       0x39
 
+/* Error code for returned values */
+#define ERROR                   0xFF
+
 /* Acceptable device IDs */
 #define APDS9960_ID_1           0xAB
 #define APDS9960_ID_2           0x9C
@@ -88,6 +91,24 @@
 #define GESTURE                 6
 #define ALL                     7
 
+/* LED Drive values */
+#define LED_DRIVE_100MA         0
+#define LED_DRIVE_50MA          1
+#define LED_DRIVE_25MA          2
+#define LED_DRIVE_12_5MA        3
+
+/* Proximity gain (PGAIN) values */
+#define PGAIN_1X                0
+#define PGAIN_2X                1
+#define PGAIN_4X                2
+#define PGAIN_8X                3
+
+/* ALS gain (AGAIN) values */
+#define AGAIN_1X                0
+#define AGAIN_4X                1
+#define AGAIN_16X               2
+#define AGAIN_64X               3    
+
 /* Default values */
 #define DEFAULT_ATIME           219     // 103ms
 #define DEFAULT_WTIME           246     // 27ms
@@ -95,7 +116,14 @@
 #define DEFAULT_POFFSET_UR      0       // 0 offset
 #define DEFAULT_POFFSET_DL      0       // 0 offset      
 #define DEFAULT_CONFIG1         0x60    // No 12x wait (WTIME) factor
-  
+#define DEFAULT_LDRIVE          LED_DRIVE_100MA
+#define DEFAULT_PGAIN           PGAIN_4X
+#define DEFAULT_AGAIN           AGAIN_1X
+#define DEFAULT_PILT            0       // Low proximity threshold
+#define DEFAULT_PIHT            50      // High proximity threshold
+#define DEFAULT_AILT            0xFFFF  // Force interrupt for calibration
+#define DEFAULT_AIHT            0
+#define DEFAULT_PERS            0x22    // 2 consecutive prox or ALS for int.
 
 /* APDS9960 Class */
 class SFE_APDS9960 {
@@ -108,13 +136,25 @@ public:
     uint8_t getMode();
     bool setMode(uint8_t mode, uint8_t enable);
     
-    /* Parameter control methods */
-    uint8_t getLDrive();
-    bool setLDrive(uint8_t);
-    uint8_t getPGain();
-    bool setPGain(uint8_t);
-    uint8_t getAGain();
-    bool setAGain(uint8_t);
+    /* Proximity Interrupt Threshold */
+    uint8_t getProxIntLowThresh();
+    bool setProxIntLowThresh(uint8_t threshold);
+    uint8_t getProxIntHighThresh();
+    bool setProxIntHighThresh(uint8_t threshold);
+    
+    /* Ambient Light Interrupt Threshold */
+    uint16_t getAmbientLightIntLowThresh();
+    bool setAmbientLightIntLowThresh(uint16_t threshold);
+    uint16_t getAmbientLightIntHighThresh();
+    bool setAmbientLightIntHighThresh(uint16_t threshold);
+    
+    /* LED and Gain Control */
+    uint8_t getLEDDrive();
+    bool setLEDDrive(uint8_t drive);
+    uint8_t getProxGain();
+    bool setProxGain(uint8_t gain);
+    uint8_t getAmbientLightGain();
+    bool setAmbientLightGain(uint8_t gain);
     
     /* Raw I2C Commansd */
     bool wireWriteByte(uint8_t val);

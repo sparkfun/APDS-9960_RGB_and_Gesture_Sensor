@@ -57,7 +57,7 @@ bool SFE_APDS9960::init()
         return false;
     }
     
-    /* Set default values for registers */
+    /* Set default values for ambient light and proximity registers */
     if( !wireWriteDataByte(APDS9960_ATIME, DEFAULT_ATIME) ) {
         return false;
     }
@@ -76,8 +76,32 @@ bool SFE_APDS9960::init()
     if( !wireWriteDataByte(APDS9960_CONFIG1, DEFAULT_CONFIG1) ) {
         return false;
     }
-    // ***SET LDRIVE, PGAIN, AGAIN
+    if( !setLEDDrive(DEFAULT_LDRIVE) ) {
+        return false;
+    }
+    if( !setProxGain(DEFAULT_PGAIN) ) {
+        return false;
+    }
+    if( !setAmbientLightGain(DEFAULT_AGAIN) ) {
+        return false;
+    }
+    if( !setProxIntLowThresh(DEFAULT_PILT) ) {
+        return false;
+    }
+    if( !setProxIntHighThresh(DEFAULT_PIHT) ) {
+        return false;
+    }
+    if( !setAmbientLightIntLowThresh(DEFAULT_AILT) ) {
+        return false;
+    }
+    if( !setAmbientLightIntHighThresh(DEFAULT_AIHT) ) {
+        return false;
+    }
+    if( !wireWriteDataByte(APDS9960_PERS, DEFAULT_PERS) ) {
+        return false;
+    }
     
+    /* Set default values for gesture sense registers */
     
     return true;
 }
@@ -93,7 +117,7 @@ uint8_t SFE_APDS9960::getMode()
     
     /* Read current ENABLE register */
     if( !wireReadDataByte(APDS9960_ENABLE, enable_value) ) {
-        return 0xFF;
+        return ERROR;
     }
     
     return enable_value;
@@ -112,7 +136,7 @@ bool SFE_APDS9960::setMode(uint8_t mode, uint8_t enable)
 
     /* Read current ENABLE register */
     reg_val = getMode();
-    if( reg_val == 0xFF ) {
+    if( reg_val == ERROR ) {
         return false;
     }
     
@@ -141,51 +165,360 @@ bool SFE_APDS9960::setMode(uint8_t mode, uint8_t enable)
 }
 
 /**
+ * @brief Returns the lower threshold for the ambient light sensor
  *
+ * @return lower threshold
  */
-uint8_t SFE_APDS9960::getLDrive()
+uint16_t SFE_APDS9960::getAmbientLightIntLowThresh()
 {
-
+    uint16_t val;
+    uint8_t val_low;
+    uint8_t val_high;
+    
+    /* Read lower byte */
+    if( !wireReadDataByte(APDS9960_AILTL, val_low) ) {
+        val_low = 0;
+    }
+    
+    /* Read high byte */
+    if( !wireReadDataByte(APDS9960_AILTH, val_high) ) {
+        val_high = 0;
+    }
+    
+    /* Combine into 16-bit value */
+    val = (uint16_t) val_high;
+    val = val << 8;
+    val |= val_low;
+    
+    return val;
 }
 
 /**
+ * @brief Sets the low threshold for the ambient light sensor
  *
+ * @param[in] threshold the low light threshold
+ * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setLDrive(uint8_t)
+bool SFE_APDS9960::setAmbientLightIntLowThresh(uint16_t threshold)
 {
-
+    uint8_t val_low;
+    uint8_t val_high;
+    
+    /* Break 16-bit threshold into 2 8-bit values */
+    val_low = threshold & 0x00FF;
+    val_high = (threshold & 0xFF00) >> 8;
+    
+    /* Write high byte */
+    if( !wireWriteDataByte(APDS9960_AILTH, val_high) ) {
+        return false;
+    }
+    
+    /* Write low byte */
+    if( !wireWriteDataByte(APDS9960_AILTL, val_low) ) {
+        return false;
+    }
+    
+    return true;
 }
 
 /**
+ * @brief Returns the high threshold for the ambient light sensor
  *
+ * @return high threshold
  */
-uint8_t SFE_APDS9960::getPGain()
+uint16_t SFE_APDS9960::getAmbientLightIntHighThresh()
 {
-
+    uint16_t val;
+    uint8_t val_low;
+    uint8_t val_high;
+    
+    /* Read lower byte */
+    if( !wireReadDataByte(APDS9960_AIHTL, val_low) ) {
+        val_low = 0;
+    }
+    
+    /* Read high byte */
+    if( !wireReadDataByte(APDS9960_AIHTH, val_high) ) {
+        val_high = 0;
+    }
+    
+    /* Combine into 16-bit value */
+    val = (uint16_t) val_high;
+    val = val << 8;
+    val |= val_low;
+    
+    return val;
 }
 
 /**
+ * @brief Sets the high threshold for the ambient light sensor
  *
+ * @param[in] threshold the high light threshold
+ * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setPGain(uint8_t)
+bool SFE_APDS9960::setAmbientLightIntHighThresh(uint16_t threshold)
 {
-
+    uint8_t val_low;
+    uint8_t val_high;
+    
+    /* Break 16-bit threshold into 2 8-bit values */
+    val_low = threshold & 0x00FF;
+    val_high = (threshold & 0xFF00) >> 8;
+    
+    /* Write high byte */
+    if( !wireWriteDataByte(APDS9960_AIHTH, val_high) ) {
+        return false;
+    }
+    
+    /* Write low byte */
+    if( !wireWriteDataByte(APDS9960_AIHTL, val_low) ) {
+        return false;
+    }
+    
+    return true;
 }
 
 /**
+ * @brief Returns the lower threshold for proximity detection
  *
+ * @return lower threshold
  */
-uint8_t SFE_APDS9960::getAGain()
+uint8_t SFE_APDS9960::getProxIntLowThresh()
 {
-
+    uint8_t val;
+    
+    /* Read value from PILT register */
+    if( !wireReadDataByte(APDS9960_PILT, val) ) {
+        val = 0;
+    }
+    
+    return val;
 }
 
 /**
+ * @brief Sets the lower threshold for proximity detection
  *
+ * @param[in] threshold the lower proximity threshold
+ * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setAGain(uint8_t)
+bool SFE_APDS9960::setProxIntLowThresh(uint8_t threshold)
 {
+    if( !wireWriteDataByte(APDS9960_PILT, threshold) ) {
+        return false;
+    }
+    
+    return true;
+}
 
+/**
+ * @brief Returns the high threshold for proximity detection
+ *
+ * @return high threshold
+ */
+uint8_t SFE_APDS9960::getProxIntHighThresh()
+{
+    uint8_t val;
+    
+    /* Read value from PIHT register */
+    if( !wireReadDataByte(APDS9960_PIHT, val) ) {
+        val = 0;
+    }
+    
+    return val;
+}
+
+/**
+ * @brief Sets the high threshold for proximity detection
+ *
+ * @param[in] threshold the high proximity threshold
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setProxIntHighThresh(uint8_t threshold)
+{
+    if( !wireWriteDataByte(APDS9960_PIHT, threshold) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Returns LED drive strength for proximity and ALS
+ *
+ * Value    LED Current
+ *   0        100 mA
+ *   1         50 mA
+ *   2         25 mA
+ *   3         12.5 mA
+ *
+ * @return the value of the LED drive strength. 0xFF on failure.
+ */
+uint8_t SFE_APDS9960::getLEDDrive()
+{
+    uint8_t val;
+    
+    /* Read value from CONTROL register */
+    if( !wireReadDataByte(APDS9960_CONTROL, val) ) {
+        return ERROR;
+    }
+    
+    /* Shift and mask out LED drive bits */
+    val = (val >> 6) & 0b00000011;
+    
+    return val;
+}
+
+/**
+ * @brief Sets the LED drive strength for proximity and ALS
+ *
+ * Value    LED Current
+ *   0        100 mA
+ *   1         50 mA
+ *   2         25 mA
+ *   3         12.5 mA
+ *
+ * @param[in] drive the value (0-3) for the LED drive strength
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setLEDDrive(uint8_t drive)
+{
+    uint8_t val;
+    
+    /* Read value from CONTROL register */
+    if( !wireReadDataByte(APDS9960_CONTROL, val) ) {
+        return false;
+    }
+    
+    /* Set bits in register to given value */
+    drive = drive << 6;
+    val &= 0b00111111;
+    val |= drive;
+    
+    /* Write register value back into CONTROL register */
+    if( !wireWriteDataByte(APDS9960_CONTROL, val) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Returns receiver gain for proximity detection
+ *
+ * Value    Gain
+ *   0       1x
+ *   1       2x
+ *   2       4x
+ *   3       8x
+ *
+ * @return the value of the proximity gain. 0xFF on failure.
+ */
+uint8_t SFE_APDS9960::getProxGain()
+{
+    uint8_t val;
+    
+    /* Read value from CONTROL register */
+    if( !wireReadDataByte(APDS9960_CONTROL, val) ) {
+        return ERROR;
+    }
+    
+    /* Shift and mask out PDRIVE bits */
+    val = (val >> 2) & 0b00000011;
+    
+    return val;
+}
+
+/**
+ * @brief Sets the receiver gain for proximity detection
+ *
+ * Value    Gain
+ *   0       1x
+ *   1       2x
+ *   2       4x
+ *   3       8x
+ *
+ * @param[in] drive the value (0-3) for the gain
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setProxGain(uint8_t drive)
+{
+    uint8_t val;
+    
+    /* Read value from CONTROL register */
+    if( !wireReadDataByte(APDS9960_CONTROL, val) ) {
+        return false;
+    }
+    
+    /* Set bits in register to given value */
+    drive = drive << 2;
+    val &= 0b11110011;
+    val |= drive;
+    
+    /* Write register value back into CONTROL register */
+    if( !wireWriteDataByte(APDS9960_CONTROL, val) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Returns receiver gain for the ambient light sensor (ALS)
+ *
+ * Value    Gain
+ *   0        1x
+ *   1        4x
+ *   2       16x
+ *   3       64x
+ *
+ * @return the value of the ALS gain. 0xFF on failure.
+ */
+uint8_t SFE_APDS9960::getAmbientLightGain()
+{
+    uint8_t val;
+    
+    /* Read value from CONTROL register */
+    if( !wireReadDataByte(APDS9960_CONTROL, val) ) {
+        return ERROR;
+    }
+    
+    /* Shift and mask out ADRIVE bits */
+    val &= 0b00000011;
+    
+    return val;
+}
+
+/**
+ * @brief Sets the receiver gain for the ambient light sensor (ALS)
+ *
+ * Value    Gain
+ *   0        1x
+ *   1        4x
+ *   2       16x
+ *   3       64x
+ *
+ * @param[in] drive the value (0-3) for the gain
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setAmbientLightGain(uint8_t drive)
+{
+    uint8_t val;
+    
+    /* Read value from CONTROL register */
+    if( !wireReadDataByte(APDS9960_CONTROL, val) ) {
+        return false;
+    }
+    
+    /* Set bits in register to given value */
+    val &= 0b11111100;
+    val |= drive;
+    
+    /* Write register value back into CONTROL register */
+    if( !wireWriteDataByte(APDS9960_CONTROL, val) ) {
+        return false;
+    }
+    
+    return true;
 }
 
 /**

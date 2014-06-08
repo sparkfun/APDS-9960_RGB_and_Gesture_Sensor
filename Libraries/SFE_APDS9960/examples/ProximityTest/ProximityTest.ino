@@ -65,6 +65,64 @@ void setup() {
   } else {
     Serial.println(F("Something went wrong during APDS-9960 init!"));
   }
+  
+  //***TEST***
+  uint8_t t;
+  uint16_t u;
+  apds.wireReadDataByte(APDS9960_CONTROL, t);
+  Serial.println(t, BIN);
+  
+  Serial.println("LDRIVE");
+  t = apds.getLEDDrive();
+  Serial.println(t);
+  apds.setLEDDrive(1);
+  t = apds.getLEDDrive();
+  Serial.println(t);
+  
+  Serial.println("PGAIN");
+  t = apds.getProxGain();
+  Serial.println(t);
+  apds.setProxGain(3);
+  t = apds.getProxGain();
+  Serial.println(t);
+  
+  Serial.println("AGAIN");
+  t = apds.getAmbientLightGain();
+  Serial.println(t);
+  apds.setAmbientLightGain(2);
+  t = apds.getAmbientLightGain();
+  Serial.println(t);
+  
+  apds.wireReadDataByte(APDS9960_CONTROL, t);
+  Serial.println(t, BIN);
+  
+  Serial.println("PILT");
+  t = apds.getProxIntLowThresh();
+  Serial.println(t);
+  apds.setProxIntLowThresh(5);
+  t = apds.getProxIntLowThresh();
+  Serial.println(t);
+
+  Serial.println("PIHT");
+  t = apds.getProxIntHighThresh();
+  Serial.println(t);
+  apds.setProxIntHighThresh(10);
+  t = apds.getProxIntHighThresh();
+  Serial.println(t);
+  
+  Serial.println("AILT");
+  u = apds.getAmbientLightIntLowThresh();
+  Serial.println(u, HEX);
+  apds.setAmbientLightIntLowThresh(0x1234);
+  u = apds.getAmbientLightIntLowThresh();
+  Serial.println(u, HEX);
+  
+  Serial.println("AIHT");
+  u = apds.getAmbientLightIntHighThresh();
+  Serial.println(u, HEX);
+  apds.setAmbientLightIntHighThresh(0xABCD);
+  u = apds.getAmbientLightIntHighThresh();
+  Serial.println(u, HEX);
 
 }
 
