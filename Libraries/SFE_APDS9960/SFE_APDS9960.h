@@ -97,17 +97,23 @@
 #define LED_DRIVE_25MA          2
 #define LED_DRIVE_12_5MA        3
 
-/* Proximity gain (PGAIN) values */
+/* Proximity Gain (PGAIN) values */
 #define PGAIN_1X                0
 #define PGAIN_2X                1
 #define PGAIN_4X                2
 #define PGAIN_8X                3
 
-/* ALS gain (AGAIN) values */
+/* ALS Gain (AGAIN) values */
 #define AGAIN_1X                0
 #define AGAIN_4X                1
 #define AGAIN_16X               2
-#define AGAIN_64X               3    
+#define AGAIN_64X               3
+
+/* LED Boost values */
+#define LED_BOOST_100           0
+#define LED_BOOST_150           1
+#define LED_BOOST_200           2
+#define LED_BOOST_300           3    
 
 /* Default values */
 #define DEFAULT_ATIME           219     // 103ms
@@ -124,6 +130,8 @@
 #define DEFAULT_AILT            0xFFFF  // Force interrupt for calibration
 #define DEFAULT_AIHT            0
 #define DEFAULT_PERS            0x22    // 2 consecutive prox or ALS for int.
+#define DEFAULT_CONFIG2         0x01    // No saturation interrupts or LED boost  
+#define DEFAULT_CONFIG3         0       // Enable all photodiodes, no SAI
 
 /* APDS9960 Class */
 class SFE_APDS9960 {
@@ -155,6 +163,16 @@ public:
     bool setProxGain(uint8_t gain);
     uint8_t getAmbientLightGain();
     bool setAmbientLightGain(uint8_t gain);
+    
+    /* LED Boost Control */
+    uint8_t getLEDBoost();
+    bool setLEDBoost(uint8_t boost);
+    
+    /* Proximity photodiode select */
+    uint8_t getProxGainCompEnable();
+    bool setProxGainCompEnable(uint8_t enable);
+    uint8_t getProxPhotoMask();
+    bool setProxPhotoMask(uint8_t mask);
     
     /* Raw I2C Commansd */
     bool wireWriteByte(uint8_t val);

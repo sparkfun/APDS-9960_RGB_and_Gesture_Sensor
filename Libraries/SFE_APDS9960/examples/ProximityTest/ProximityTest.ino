@@ -123,6 +123,30 @@ void setup() {
   apds.setAmbientLightIntHighThresh(0xABCD);
   u = apds.getAmbientLightIntHighThresh();
   Serial.println(u, HEX);
+  
+  Serial.println("LED_BOOST");
+  t = apds.getLEDBoost();
+  Serial.println(t);
+  apds.setLEDBoost(2);
+  t = apds.getLEDBoost();
+  Serial.println(t);
+  
+  Serial.println("PCMP");
+  t = apds.getProxGainCompEnable();
+  Serial.println(t);
+  apds.setProxGainCompEnable(1);
+  t = apds.getProxGainCompEnable();
+  Serial.println(t);
+  
+  Serial.println("PROX_MASK");
+  t = apds.getProxPhotoMask();
+  Serial.println(t);
+  apds.setProxPhotoMask(0x09);
+  t = apds.getProxPhotoMask();
+  Serial.println(t, HEX);
+  
+  apds.wireReadDataByte(APDS9960_CONFIG3, t);
+  Serial.println(t, BIN);
 
 }
 

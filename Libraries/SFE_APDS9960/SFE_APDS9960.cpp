@@ -100,11 +100,22 @@ bool SFE_APDS9960::init()
     if( !wireWriteDataByte(APDS9960_PERS, DEFAULT_PERS) ) {
         return false;
     }
+    if( !wireWriteDataByte(APDS9960_CONFIG2, DEFAULT_CONFIG2) ) {
+        return false;
+    }
+    if( !wireWriteDataByte(APDS9960_CONFIG3, DEFAULT_CONFIG3) ) {
+        return false;
+    }
     
     /* Set default values for gesture sense registers */
     
+    
     return true;
 }
+
+/*******************************************************************************
+ * Getters and Setters for Register Values
+ ******************************************************************************/
 
 /**
  * @brief Reads and returns the contents of the ENABLE register
@@ -450,6 +461,7 @@ bool SFE_APDS9960::setProxGain(uint8_t drive)
     }
     
     /* Set bits in register to given value */
+    drive &= 0b00000011;
     drive = drive << 2;
     val &= 0b11110011;
     val |= drive;
@@ -510,6 +522,7 @@ bool SFE_APDS9960::setAmbientLightGain(uint8_t drive)
     }
     
     /* Set bits in register to given value */
+    drive &= 0b00000011;
     val &= 0b11111100;
     val |= drive;
     
@@ -520,6 +533,182 @@ bool SFE_APDS9960::setAmbientLightGain(uint8_t drive)
     
     return true;
 }
+
+/**
+ * @brief Get the current LED boost value
+ * 
+ * Value  Boost Current
+ *   0        100%
+ *   1        150%
+ *   2        200%
+ *   3        300%
+ *
+ * @return The LED boost value. 0xFF on failure.
+ */
+uint8_t SFE_APDS9960::getLEDBoost()
+{
+    uint8_t val;
+    
+    /* Read value from CONFIG2 register */
+    if( !wireReadDataByte(APDS9960_CONFIG2, val) ) {
+        return ERROR;
+    }
+    
+    /* Shift and mask out LED_BOOST bits */
+    val = (val >> 4) & 0b00000011;
+    
+    return val;
+}
+
+/**
+ * @brief Sets the LED current boost value
+ *
+ * Value  Boost Current
+ *   0        100%
+ *   1        150%
+ *   2        200%
+ *   3        300%
+ *
+ * @param[in] drive the value (0-3) for current boost (100-300%)
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setLEDBoost(uint8_t boost)
+{
+    uint8_t val;
+    
+    /* Read value from CONFIG2 register */
+    if( !wireReadDataByte(APDS9960_CONFIG2, val) ) {
+        return false;
+    }
+    
+    /* Set bits in register to given value */
+    boost &= 0b00000011;
+    boost = boost << 4;
+    val &= 0b11001111;
+    val |= boost;
+    
+    /* Write register value back into CONFIG2 register */
+    if( !wireWriteDataByte(APDS9960_CONFIG2, val) ) {
+        return false;
+    }
+    
+    return true;
+}    
+   
+/**
+ * @brief Gets proximity gain compensation enable
+ *
+ * @return 1 if compensation is enabled. 0 if not. 0xFF on error.
+ */
+uint8_t SFE_APDS9960::getProxGainCompEnable()
+{
+    uint8_t val;
+    
+    /* Read value from CONFIG3 register */
+    if( !wireReadDataByte(APDS9960_CONFIG3, val) ) {
+        return ERROR;
+    }
+    
+    /* Shift and mask out PCMP bits */
+    val = (val >> 5) & 0b00000001;
+    
+    return val;
+}
+
+/**
+ * @brief Sets the proximity gain compensation enable
+ *
+ * @param[in] enable 1 to enable compensation. 0 to disable compensation.
+ * @return True if operation successful. False otherwise.
+ */
+ bool SFE_APDS9960::setProxGainCompEnable(uint8_t enable)
+{
+    uint8_t val;
+    
+    /* Read value from CONFIG3 register */
+    if( !wireReadDataByte(APDS9960_CONFIG3, val) ) {
+        return false;
+    }
+    
+    /* Set bits in register to given value */
+    enable &= 0b00000001;
+    enable = enable << 5;
+    val &= 0b11011111;
+    val |= enable;
+    
+    /* Write register value back into CONFIG3 register */
+    if( !wireWriteDataByte(APDS9960_CONFIG3, val) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Gets the current mask for enabled/disabled proximity photodiodes
+ *
+ * 1 = disabled, 0 = enabled
+ * Bit    Photodiode
+ *  3       UP
+ *  2       DOWN
+ *  1       LEFT
+ *  0       RIGHT
+ *
+ * @return Current proximity mask for photodiodes. 0xFF on error.
+ */
+uint8_t SFE_APDS9960::getProxPhotoMask()
+{
+    uint8_t val;
+    
+    /* Read value from CONFIG3 register */
+    if( !wireReadDataByte(APDS9960_CONFIG3, val) ) {
+        return ERROR;
+    }
+    
+    /* Mask out photodiode enable mask bits */
+    val &= 0b00001111;
+    
+    return val;
+}
+
+/**
+ * @brief Sets the mask for enabling/disabling proximity photodiodes
+ *
+ * 1 = disabled, 0 = enabled
+ * Bit    Photodiode
+ *  3       UP
+ *  2       DOWN
+ *  1       LEFT
+ *  0       RIGHT
+ *
+ * @param[in] mask 4-bit mask value
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setProxPhotoMask(uint8_t mask)
+{
+    uint8_t val;
+    
+    /* Read value from CONFIG3 register */
+    if( !wireReadDataByte(APDS9960_CONFIG3, val) ) {
+        return false;
+    }
+    
+    /* Set bits in register to given value */
+    mask &= 0b00001111;
+    val &= 0b11110000;
+    val |= mask;
+    
+    /* Write register value back into CONFIG3 register */
+    if( !wireWriteDataByte(APDS9960_CONFIG3, val) ) {
+        return false;
+    }
+    
+    return true;
+}
+   
+/*******************************************************************************
+ * Raw I2C Reads and Writes
+ ******************************************************************************/
 
 /**
  * @brief Writes a single byte to the I2C device (no register)
