@@ -35,3 +35,47 @@ buy us a round!
 
 Distributed as-is; no warranty is given.
 ****************************************************************/
+
+#include <Wire.h>
+#include <SFE_APDS9960.h>
+
+// Pins
+#define APDS9960_INT    2 // Needs to be an interrupt pin
+
+// Constants
+
+// Global Variables
+SFE_APDS9960 apds = SFE_APDS9960();
+
+void setup() {
+
+  // Initialize Serial port
+  Serial.begin(115200);
+  Serial.println();
+  Serial.println(F("--------------------------------"));
+  Serial.println(F("SparkFun APDS-9960 - GestureTest"));
+  Serial.println(F("--------------------------------"));
+  
+  // Initialize interrupt service routine
+  attachInterrupt(0, interruptRoutine, FALLING);
+
+  // Initialize APDS-9960 (configure I2C and initial values)
+  if ( apds.init() ) {
+    Serial.println(F("APDS-9960 initialization complete"));
+  } else {
+    Serial.println(F("Something went wrong during APDS-9960 init!"));
+  }
+
+}
+
+void loop() {
+    
+  // See if there is any gesture data available
+  if ( apds.isGestureAvailable() ) {
+    Serial.println(apds.readGesture());
+  }
+}
+
+void interruptRoutine() {
+
+}

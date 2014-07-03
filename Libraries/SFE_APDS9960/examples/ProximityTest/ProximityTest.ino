@@ -145,9 +145,54 @@ void setup() {
   t = apds.getProxPhotoMask();
   Serial.println(t, HEX);
   
-  apds.wireReadDataByte(APDS9960_CONFIG3, t);
-  Serial.println(t, BIN);
-
+  Serial.println("GENTH");
+  t = apds.getGestureEnterThresh();
+  Serial.println(t);
+  apds.setGestureEnterThresh(55);
+  t = apds.getGestureEnterThresh();
+  Serial.println(t);
+  
+  Serial.println("GEXTH");
+  t = apds.getGestureExitThresh();
+  Serial.println(t);
+  apds.setGestureExitThresh(25);
+  t = apds.getGestureExitThresh();
+  Serial.println(t);
+  
+  Serial.println("GGAIN");
+  t = apds.getGestureGain();
+  Serial.println(t);
+  apds.setGestureGain(3);
+  t = apds.getGestureGain();
+  Serial.println(t);
+  
+  Serial.println("GLDRIVE");
+  t = apds.getGestureLEDDrive();
+  Serial.println(t);
+  apds.setGestureLEDDrive(3);
+  t = apds.getGestureLEDDrive();
+  Serial.println(t);
+  
+  Serial.println("GWTIME");
+  t = apds.getGestureWaitTime();
+  Serial.println(t);
+  apds.setGestureWaitTime(7);
+  t = apds.getGestureWaitTime();
+  Serial.println(t);
+  
+  Serial.println("GIEN");
+  t = apds.getGestureIntEnable();
+  Serial.println(t);
+  apds.setGestureIntEnable(1);
+  t = apds.getGestureIntEnable();
+  Serial.println(t);
+  
+  Serial.println("GMODE");
+  t = apds.getGestureMode();
+  Serial.println(t);
+  apds.setGestureMode(1);
+  t = apds.getGestureMode();
+  Serial.println(t);
 }
 
 void loop() {

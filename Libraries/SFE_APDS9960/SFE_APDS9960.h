@@ -16,6 +16,9 @@
 
 #include <Arduino.h>
 
+/* Debug */
+#define DEBUG                   1
+
 /* APDS-9960 I2C address */
 #define APDS9960_I2C_ADDR       0x39
 
@@ -25,6 +28,16 @@
 /* Acceptable device IDs */
 #define APDS9960_ID_1           0xAB
 #define APDS9960_ID_2           0x9C
+
+/* Gesture IDs */
+#define GESTURE_NONE           0
+#define GESTURE_SWIPE_UP       1
+#define GESTURE_SWIPE_DOWN     2
+#define GESTURE_SWIPE_LEFT     3
+#define GESTURE_SWIPE_RIGHT    4    
+
+/* Misc parameters */
+#define FIFO_PAUSE_TIME         30      // Wait period (ms) between FIFO reads
 
 /* APDS-9960 register addresses */
 #define APDS9960_ENABLE         0x80
@@ -77,6 +90,16 @@
 #define APDS9960_GFIFO_L        0xFE
 #define APDS9960_GFIFO_R        0xFF
 
+/* Bit fields */
+#define APDS9960_PON            0b00000001
+#define APDS9960_AEN            0b00000010
+#define APDS9960_PEN            0b00000100
+#define APDS9960_WEN            0b00001000
+#define APSD9960_AIEN           0b00010000
+#define APDS9960_PIEN           0b00100000
+#define APDS9960_GEN            0b01000000
+#define APDS9960_GVALID         0b00000001
+
 /* On/Off definitions */
 #define OFF                     0
 #define ON                      1
@@ -109,16 +132,33 @@
 #define AGAIN_16X               2
 #define AGAIN_64X               3
 
+/* Gesture Gain (GGAIN) values */
+#define GGAIN_1X                0
+#define GGAIN_2X                1
+#define GGAIN_4X                2
+#define GGAIN_8X                3
+
 /* LED Boost values */
 #define LED_BOOST_100           0
 #define LED_BOOST_150           1
 #define LED_BOOST_200           2
 #define LED_BOOST_300           3    
 
+/* Gesture wait time values */
+#define GWTIME_0MS              0
+#define GWTIME_2_8MS            1
+#define GWTIME_5_6MS            2
+#define GWTIME_8_4MS            3
+#define GWTIME_14_0MS           4
+#define GWTIME_22_4MS           5
+#define GWTIME_30_8MS           6
+#define GWTIME_39_2MS           7
+
 /* Default values */
 #define DEFAULT_ATIME           219     // 103ms
 #define DEFAULT_WTIME           246     // 27ms
-#define DEFAULT_PPULSE          0x87    // 16us, 8 pulses
+#define DEFAULT_PROX_PPULSE     0x87    // 16us, 8 pulses
+#define DEFAULT_GESTURE_PPULSE  0x89    // 16us, 10 pulses
 #define DEFAULT_POFFSET_UR      0       // 0 offset
 #define DEFAULT_POFFSET_DL      0       // 0 offset      
 #define DEFAULT_CONFIG1         0x60    // No 12x wait (WTIME) factor
@@ -132,18 +172,56 @@
 #define DEFAULT_PERS            0x22    // 2 consecutive prox or ALS for int.
 #define DEFAULT_CONFIG2         0x01    // No saturation interrupts or LED boost  
 #define DEFAULT_CONFIG3         0       // Enable all photodiodes, no SAI
+#define DEFAULT_GPENTH          40      // Threshold for entering gesture mode
+#define DEFAULT_GEXTH           30      // Threshold for exiting gesture mode    
+#define DEFAULT_GCONF1          0x40    // 4 gesture events for int., 1 for exit
+#define DEFAULT_GGAIN           LED_DRIVE_100MA
+#define DEFAULT_GLDRIVE         GGAIN_4X 
+#define DEFAULT_GWTIME          GWTIME_2_8MS
+#define DEFAULT_GOFFSET         0       // No offset scaling for gesture mode
+#define DEFAULT_GPULSE          0xC9    // 32us, 10 pulses
+#define DEFAULT_GCONF3          0       // All photodiodes active during gesture
+#define DEFAULT_GIEN            0       // Disable gesture interrupts
+
+/* Container for gesture data */
+typedef struct gesture_data_type {
+    uint8_t u_data[32];
+    uint8_t d_data[32];
+    uint8_t l_data[32];
+    uint8_t r_data[32];
+    uint8_t index;
+    uint8_t total_gestures;
+    uint8_t in_threshold;
+    uint8_t out_threshold;
+} gesture_data_type;
 
 /* APDS9960 Class */
 class SFE_APDS9960 {
 public:
+
+    /* Constructor and destructor*/
     SFE_APDS9960();
     ~SFE_APDS9960();
     
-    /* Initialization and enable */
+    /* Initialization*/
     bool init();
+    
+    /* Turn features on and off */
     uint8_t getMode();
     bool setMode(uint8_t mode, uint8_t enable);
     
+    /* Data availability */
+    bool isGestureAvailable();
+    
+    /* Get readings from sensors */
+    int readGesture();
+    
+private:
+
+    /* Gesture processing */
+    void resetGestureParameters();
+    bool processGestureData();
+
     /* Proximity Interrupt Threshold */
     uint8_t getProxIntLowThresh();
     bool setProxIntLowThresh(uint8_t threshold);
@@ -174,12 +252,35 @@ public:
     uint8_t getProxPhotoMask();
     bool setProxPhotoMask(uint8_t mask);
     
-    /* Raw I2C Commansd */
+    /* Gesture threshold control */
+    uint8_t getGestureEnterThresh();
+    bool setGestureEnterThresh(uint8_t threshold);
+    uint8_t getGestureExitThresh();
+    bool setGestureExitThresh(uint8_t threshold);
+    
+    /* Gesture LED, gain, and time control */
+    uint8_t getGestureGain();
+    bool setGestureGain(uint8_t gain);
+    uint8_t getGestureLEDDrive();
+    bool setGestureLEDDrive(uint8_t drive);
+    uint8_t getGestureWaitTime();
+    bool setGestureWaitTime(uint8_t time);
+    
+    /* Gesture interrupt enable and mode */
+    uint8_t getGestureIntEnable();
+    bool setGestureIntEnable(uint8_t enable);
+    uint8_t getGestureMode();
+    bool setGestureMode(uint8_t mode);
+
+    /* Raw I2C Commands */
     bool wireWriteByte(uint8_t val);
     bool wireWriteDataByte(uint8_t reg, uint8_t val);
     bool wireWriteDataBlock(uint8_t reg, uint8_t *val, unsigned int len);
     bool wireReadDataByte(uint8_t reg, uint8_t &val);
     bool wireReadDataBlock(uint8_t reg, uint8_t *val, unsigned int len);
+
+    /* Members */
+    gesture_data_type gesture_data_;
 };
 
 #endif

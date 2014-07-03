@@ -64,7 +64,7 @@ bool SFE_APDS9960::init()
     if( !wireWriteDataByte(APDS9960_WTIME, DEFAULT_WTIME) ) {
         return false;
     }
-    if( !wireWriteDataByte(APDS9960_PPULSE, DEFAULT_PPULSE) ) {
+    if( !wireWriteDataByte(APDS9960_PPULSE, DEFAULT_PROX_PPULSE) ) {
         return false;
     }
     if( !wireWriteDataByte(APDS9960_POFFSET_UR, DEFAULT_POFFSET_UR) ) {
@@ -108,13 +108,88 @@ bool SFE_APDS9960::init()
     }
     
     /* Set default values for gesture sense registers */
+    if( !setGestureEnterThresh(DEFAULT_GPENTH) ) {
+        return false;
+    }
+    if( !setGestureExitThresh(DEFAULT_GEXTH) ) {
+        return false;
+    }
+    if( !wireWriteDataByte(APDS9960_GCONF1, DEFAULT_GCONF1) ) {
+        return false;
+    }
+    if( !setGestureGain(DEFAULT_GGAIN) ) {
+        return false;
+    }
+    if( !setGestureLEDDrive(DEFAULT_GLDRIVE) ) {
+        return false;
+    }
+    if( !setGestureWaitTime(DEFAULT_GWTIME) ) {
+        return false;
+    }
+    if( !wireWriteDataByte(APDS9960_GOFFSET_U, DEFAULT_GOFFSET) ) {
+        return false;
+    }
+    if( !wireWriteDataByte(APDS9960_GOFFSET_D, DEFAULT_GOFFSET) ) {
+        return false;
+    }
+    if( !wireWriteDataByte(APDS9960_GOFFSET_L, DEFAULT_GOFFSET) ) {
+        return false;
+    }
+    if( !wireWriteDataByte(APDS9960_GOFFSET_R, DEFAULT_GOFFSET) ) {
+        return false;
+    }
+    if( !wireWriteDataByte(APDS9960_GPULSE, DEFAULT_GPULSE) ) {
+        return false;
+    }
+    if( !wireWriteDataByte(APDS9960_GCONF3, DEFAULT_GCONF3) ) {
+        return false;
+    }
+    if( !setGestureIntEnable(DEFAULT_GIEN) ) {
+        return false;
+    }
     
+    /* Enable gesture mode ***move to separate function?*** 
+       Set ENABLE to 0 (power off)
+       Set WTIME to 0xFF
+       Set AUX to LED_BOOST_300
+       Set GCTRL to 0x07 (???)
+       Enable PON, WEN, PEN, GEN in ENABLE 
+    */
+    resetGestureParameters();
+    if( !wireWriteDataByte(APDS9960_WTIME, 0xFF) ) {
+        return false;
+    }
+    if( !wireWriteDataByte(APDS9960_PPULSE, DEFAULT_GESTURE_PPULSE) ) {
+        return false;
+    }
+    if( !setLEDBoost(LED_BOOST_300) ) {
+        return false;
+    }
+    // Clear GFIFO? No such field in new datasheet
+    if( !setGestureIntEnable(1) ) {
+        return false;
+    }
+    if( !setGestureMode(1) ) {
+        return false;
+    }
+    if( !setMode(POWER, 1) ) {
+        return false;
+    }
+    if( !setMode(WAIT, 1) ) {
+        return false;
+    }
+    if( !setMode(PROXIMITY, 1) ) {
+        return false;
+    }
+    if( !setMode(GESTURE, 1) ) {
+        return false;
+    }
     
     return true;
 }
 
 /*******************************************************************************
- * Getters and Setters for Register Values
+ * Public methods for controlling the APDS-9960
  ******************************************************************************/
 
 /**
@@ -174,6 +249,142 @@ bool SFE_APDS9960::setMode(uint8_t mode, uint8_t enable)
         
     return true;
 }
+
+/**
+ * @brief Determines if there is a gesture available for reading
+ *
+ * @return True if gesture available. False otherwise.
+ */
+bool SFE_APDS9960::isGestureAvailable()
+{
+    uint8_t val;
+    
+    /* Read value from GSTATUS register */
+    if( !wireReadDataByte(APDS9960_GSTATUS, val) ) {
+        return ERROR;
+    }
+    
+    /* Shift and mask out GVALID bit */
+    val &= APDS9960_GVALID;
+    
+    /* Return true/false based on GVALID bit */
+    if( val == 1) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/**
+ * @brief Processes a gesture event and returns best guessed gesture
+ *
+ * @return Number corresponding to gesture. -1 on error.
+ */
+int SFE_APDS9960::readGesture()
+{
+    unsigned int gesture_start_time;
+    uint8_t fifo_level = 0;
+    uint8_t fifo_data[128];
+    int i;
+    
+    /* Make sure that power and gesture is on and data is valid */
+    if( !isGestureAvailable() || !(getMode() & 0b01000001) ) {
+        return GESTURE_NONE;
+    }
+    
+    /* Get start time - used to see how long a gesture takes */
+    gesture_start_time = millis();
+    
+    /* Keep looping as long as gesture data is valid */
+    while( isGestureAvailable() ) {
+        
+        /* Wait some time to collect next batch of FIFO data */
+        delay(FIFO_PAUSE_TIME);
+        
+        /* Read the current FIFO level */
+        if( !wireReadDataByte(APDS9960_GFLVL, fifo_level) ) {
+            return ERROR;
+        }
+#if DEBUG
+        Serial.print("FIFO Level: ");
+        Serial.println(fifo_level);
+#endif
+        
+        /* If there's stuff in the FIFO, read it into our gesture data block */
+        if( fifo_level > 0) {
+            if( !wireReadDataBlock( APDS9960_GFIFO_U, 
+                                    (uint8_t*)fifo_data, 
+                                    (fifo_level * 4) ) ) {
+                return ERROR;
+            }
+
+            /* If there was at least 1 value, sort the data into U/D/L/R */
+            if( fifo_level >= 1 ) {
+                for( i = 0; i < (fifo_level * 4); i += 4 ) {
+                    gesture_data_.u_data[gesture_data_.index] = fifo_data[i + 0];
+                    gesture_data_.d_data[gesture_data_.index] = fifo_data[i + 1];
+                    gesture_data_.l_data[gesture_data_.index] = fifo_data[i + 2];
+                    gesture_data_.r_data[gesture_data_.index] = fifo_data[i + 3];
+                    gesture_data_.index++;
+                    gesture_data_.total_gestures++;
+                }
+#if DEBUG
+                for( i = 0; i < gesture_data_.index; i++ ) {
+                    Serial.print("U: ");
+                    Serial.print(gesture_data_.u_data[i]);
+                    Serial.print(" D: ");
+                    Serial.print(gesture_data_.d_data[i]);
+                    Serial.print(" L: ");
+                    Serial.print(gesture_data_.l_data[i]);
+                    Serial.print(" R: ");
+                    Serial.print(gesture_data_.r_data[i]);
+                    Serial.println();
+                }
+#endif
+
+                /* Filter and process gesture data */
+                if( processGestureData() ) {
+                
+                    /* ***TODO: DECODE!*** */
+                    
+                }
+            }
+            
+        }
+    }
+    
+    /* Determine best guessed gesture and clean up */
+    delay(FIFO_PAUSE_TIME);
+    
+    return GESTURE_NONE;
+}
+
+/*******************************************************************************
+ * High-level gesture controls
+ ******************************************************************************/
+
+/**
+ * @brief Resets all the parameters in the gesture data member
+ */
+void SFE_APDS9960::resetGestureParameters()
+{
+    gesture_data_.index = 0;
+    gesture_data_.total_gestures = 0;
+}
+
+/**
+ * @brief Processes the raw gesture data to determine swipe direction
+ *
+ * @return True if data was processed. False if not enough data to process.
+ */
+bool SFE_APDS9960::processGestureData()
+{
+    /* ***TODO: THIS!*** */
+}
+
+/*******************************************************************************
+ * Getters and setters for register values
+ ******************************************************************************/
 
 /**
  * @brief Returns the lower threshold for the ambient light sensor
@@ -401,6 +612,7 @@ bool SFE_APDS9960::setLEDDrive(uint8_t drive)
     }
     
     /* Set bits in register to given value */
+    drive &= 0b00000011;
     drive = drive << 6;
     val &= 0b00111111;
     val |= drive;
@@ -705,7 +917,358 @@ bool SFE_APDS9960::setProxPhotoMask(uint8_t mask)
     
     return true;
 }
-   
+
+/**
+ * @brief Gets the entry proximity threshold for gesture sensing
+ *
+ * @return Current entry proximity threshold.
+ */
+uint8_t SFE_APDS9960::getGestureEnterThresh()
+{
+    uint8_t val;
+    
+    /* Read value from GPENTH register */
+    if( !wireReadDataByte(APDS9960_GPENTH, val) ) {
+        val = 0;
+    }
+    
+    return val;
+}
+
+/**
+ * @brief Sets the entry proximity threshold for gesture sensing
+ *
+ * @param[in] threshold proximity value needed to start gesture mode
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setGestureEnterThresh(uint8_t threshold)
+{
+    if( !wireWriteDataByte(APDS9960_GPENTH, threshold) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Gets the exit proximity threshold for gesture sensing
+ *
+ * @return Current exit proximity threshold.
+ */
+uint8_t SFE_APDS9960::getGestureExitThresh()
+{
+    uint8_t val;
+    
+    /* Read value from GEXTH register */
+    if( !wireReadDataByte(APDS9960_GEXTH, val) ) {
+        val = 0;
+    }
+    
+    return val;
+}
+
+/**
+ * @brief Sets the exit proximity threshold for gesture sensing
+ *
+ * @param[in] threshold proximity value needed to end gesture mode
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setGestureExitThresh(uint8_t threshold)
+{
+    if( !wireWriteDataByte(APDS9960_GEXTH, threshold) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Gets the gain of the photodiode during gesture mode
+ *
+ * Value    Gain
+ *   0       1x
+ *   1       2x
+ *   2       4x
+ *   3       8x
+ *
+ * @return the current photodiode gain. 0xFF on error.
+ */
+uint8_t SFE_APDS9960::getGestureGain()
+{
+    uint8_t val;
+    
+    /* Read value from GCONF2 register */
+    if( !wireReadDataByte(APDS9960_GCONF2, val) ) {
+        return ERROR;
+    }
+    
+    /* Shift and mask out GGAIN bits */
+    val = (val >> 5) & 0b00000011;
+    
+    return val;
+}
+
+/**
+ * @brief Sets the gain of the photodiode during gesture mode
+ *
+ * Value    Gain
+ *   0       1x
+ *   1       2x
+ *   2       4x
+ *   3       8x
+ *
+ * @param[in] gain the value for the photodiode gain
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setGestureGain(uint8_t gain)
+{
+    uint8_t val;
+    
+    /* Read value from GCONF2 register */
+    if( !wireReadDataByte(APDS9960_GCONF2, val) ) {
+        return false;
+    }
+    
+    /* Set bits in register to given value */
+    gain &= 0b00000011;
+    gain = gain << 6;
+    val &= 0b10011111;
+    val |= gain;
+    
+    /* Write register value back into GCONF2 register */
+    if( !wireWriteDataByte(APDS9960_GCONF2, val) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Gets the drive current of the LED during gesture mode
+ *
+ * Value    LED Current
+ *   0        100 mA
+ *   1         50 mA
+ *   2         25 mA
+ *   3         12.5 mA
+ *
+ * @return the LED drive current value. 0xFF on error.
+ */
+uint8_t SFE_APDS9960::getGestureLEDDrive()
+{
+    uint8_t val;
+    
+    /* Read value from GCONF2 register */
+    if( !wireReadDataByte(APDS9960_GCONF2, val) ) {
+        return ERROR;
+    }
+    
+    /* Shift and mask out GLDRIVE bits */
+    val = (val >> 3) & 0b00000011;
+    
+    return val;
+}
+
+/**
+ * @brief Sets the LED drive current during gesture mode
+ *
+ * Value    LED Current
+ *   0        100 mA
+ *   1         50 mA
+ *   2         25 mA
+ *   3         12.5 mA
+ *
+ * @param[in] drive the value for the LED drive current
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setGestureLEDDrive(uint8_t drive)
+{
+    uint8_t val;
+    
+    /* Read value from GCONF2 register */
+    if( !wireReadDataByte(APDS9960_GCONF2, val) ) {
+        return false;
+    }
+    
+    /* Set bits in register to given value */
+    drive &= 0b00000011;
+    drive = drive << 3;
+    val &= 0b11100111;
+    val |= drive;
+    
+    /* Write register value back into GCONF2 register */
+    if( !wireWriteDataByte(APDS9960_GCONF2, val) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Gets the time in low power mode between gesture detections
+ *
+ * Value    Wait time
+ *   0          0 ms
+ *   1          2.8 ms
+ *   2          5.6 ms
+ *   3          8.4 ms
+ *   4         14.0 ms
+ *   5         22.4 ms
+ *   6         30.8 ms
+ *   7         39.2 ms
+ *
+ * @return the current wait time between gestures. 0xFF on error.
+ */
+uint8_t SFE_APDS9960::getGestureWaitTime()
+{
+    uint8_t val;
+    
+    /* Read value from GCONF2 register */
+    if( !wireReadDataByte(APDS9960_GCONF2, val) ) {
+        return ERROR;
+    }
+    
+    /* Mask out GWTIME bits */
+    val &= 0b00000111;
+    
+    return val;
+}
+
+/**
+ * @brief Sets the time in low power mode between gesture detections
+ *
+ * Value    Wait time
+ *   0          0 ms
+ *   1          2.8 ms
+ *   2          5.6 ms
+ *   3          8.4 ms
+ *   4         14.0 ms
+ *   5         22.4 ms
+ *   6         30.8 ms
+ *   7         39.2 ms
+ *
+ * @param[in] the value for the wait time
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setGestureWaitTime(uint8_t time)
+{
+    uint8_t val;
+    
+    /* Read value from GCONF2 register */
+    if( !wireReadDataByte(APDS9960_GCONF2, val) ) {
+        return false;
+    }
+    
+    /* Set bits in register to given value */
+    time &= 0b00000111;
+    val &= 0b11111000;
+    val |= time;
+    
+    /* Write register value back into GCONF2 register */
+    if( !wireWriteDataByte(APDS9960_GCONF2, val) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Gets if gesture interrupts are enabled or not
+ *
+ * @return 1 if interrupts are enabled, 0 if not. 0xFF on error.
+ */
+uint8_t SFE_APDS9960::getGestureIntEnable()
+{
+    uint8_t val;
+    
+    /* Read value from GCONF4 register */
+    if( !wireReadDataByte(APDS9960_GCONF4, val) ) {
+        return ERROR;
+    }
+    
+    /* Shift and mask out GIEN bit */
+    val = (val >> 1) & 0b00000001;
+    
+    return val;
+}
+
+/**
+ * @brief Turns gesture-related interrupts on or off
+ *
+ * @param[in] enable 1 to enable interrupts, 0 to turn them off
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setGestureIntEnable(uint8_t enable)
+{
+    uint8_t val;
+    
+    /* Read value from GCONF4 register */
+    if( !wireReadDataByte(APDS9960_GCONF4, val) ) {
+        return false;
+    }
+    
+    /* Set bits in register to given value */
+    enable &= 0b00000001;
+    enable = enable << 1;
+    val &= 0b11111101;
+    val |= enable;
+    
+    /* Write register value back into GCONF4 register */
+    if( !wireWriteDataByte(APDS9960_GCONF4, val) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Tells if the gesture state machine is currently running
+ *
+ * @return 1 if gesture state machine is running, 0 if not. 0xFF on error.
+ */
+uint8_t SFE_APDS9960::getGestureMode()
+{
+    uint8_t val;
+    
+    /* Read value from GCONF4 register */
+    if( !wireReadDataByte(APDS9960_GCONF4, val) ) {
+        return ERROR;
+    }
+    
+    /* Mask out GMODE bit */
+    val &= 0b00000001;
+    
+    return val;
+}
+
+/**
+ * @brief Tells the state machine to either enter or exit gesture state machine
+ *
+ * @param[in] mode 1 to enter gesture state machine, 0 to exit.
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setGestureMode(uint8_t mode)
+{
+    uint8_t val;
+    
+    /* Read value from GCONF4 register */
+    if( !wireReadDataByte(APDS9960_GCONF4, val) ) {
+        return false;
+    }
+    
+    /* Set bits in register to given value */
+    mode &= 0b00000001;
+    val &= 0b11111110;
+    val |= mode;
+    
+    /* Write register value back into GCONF4 register */
+    if( !wireWriteDataByte(APDS9960_GCONF4, val) ) {
+        return false;
+    }
+    
+    return true;
+}
+
 /*******************************************************************************
  * Raw I2C Reads and Writes
  ******************************************************************************/
