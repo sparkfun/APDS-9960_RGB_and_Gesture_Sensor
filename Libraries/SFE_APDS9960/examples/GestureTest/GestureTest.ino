@@ -72,7 +72,7 @@ void loop() {
     
   // See if there is any gesture data available
   if ( apds.isGestureAvailable() ) {
-    switch ( apds.readGesture() ) {
+/*    switch ( apds.readGesture() ) {
       case DIR_UP:
         Serial.println("UP");
         break;
@@ -93,7 +93,7 @@ void loop() {
         break;
       default:
         Serial.println("NONE");
-    }
+    }*/
   }
 }
 

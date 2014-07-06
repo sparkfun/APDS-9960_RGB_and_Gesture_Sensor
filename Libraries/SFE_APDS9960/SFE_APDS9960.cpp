@@ -321,6 +321,7 @@ int SFE_APDS9960::readGesture()
 {
     uint8_t fifo_level = 0;
     uint8_t fifo_data[128];
+    uint8_t gstatus;
     int i;
     
     /* Make sure that power and gesture is on and data is valid */
@@ -329,52 +330,114 @@ int SFE_APDS9960::readGesture()
     }
     
     /* Keep looping as long as gesture data is valid */
-    while( isGestureAvailable() ) {
-        
+    while(1) {
+    
         /* Wait some time to collect next batch of FIFO data */
         delay(FIFO_PAUSE_TIME);
         
-        /* Read the current FIFO level */
-        if( !wireReadDataByte(APDS9960_GFLVL, fifo_level) ) {
+        /* Get the contents of the STATUS register. Is data still valid? */
+        if( !wireReadDataByte(APDS9960_GSTATUS, gstatus) ) {
             return ERROR;
         }
         
-        /* If there's stuff in the FIFO, read it into our gesture data block */
-        if( fifo_level > 0) {
-            if( !wireReadDataBlock( APDS9960_GFIFO_U, 
-                                    (uint8_t*)fifo_data, 
-                                    (fifo_level * 4) ) ) {
+        /* If we have valid data, read in FIFO */
+        if( (gstatus & APDS9960_GVALID) == APDS9960_GVALID ) {
+        
+            /* Read the current FIFO level */
+            if( !wireReadDataByte(APDS9960_GFLVL, fifo_level) ) {
                 return ERROR;
             }
-
-            /* If there was at least 1 value, sort the data into U/D/L/R */
-            if( fifo_level >= 1 ) {
-                for( i = 0; i < (fifo_level * 4); i += 4 ) {
-                    gesture_data_.u_data[gesture_data_.index] = fifo_data[i + 0];
-                    gesture_data_.d_data[gesture_data_.index] = fifo_data[i + 1];
-                    gesture_data_.l_data[gesture_data_.index] = fifo_data[i + 2];
-                    gesture_data_.r_data[gesture_data_.index] = fifo_data[i + 3];
-                    gesture_data_.index++;
-                    gesture_data_.total_gestures++;
+            
+            /* If there's stuff in the FIFO, read it into our data block */
+            if( fifo_level > 0) {
+                if( !wireReadDataBlock( APDS9960_GFIFO_U, 
+                                        (uint8_t*)fifo_data, 
+                                        (fifo_level * 4) ) ) {
+                    return ERROR;
                 }
 
-                /* Filter and process gesture data. Decode near/far state. */
-                if( processGestureData() ) {
-                    decodeGesture();
+                /* If there was at least 1 value, sort the data into U/D/L/R */
+                if( fifo_level >= 1 ) {
+                    for( i = 0; i < (fifo_level * 4); i += 4 ) {
+                        gesture_data_.u_data[gesture_data_.index] = \
+                                                            fifo_data[i + 0];
+                        gesture_data_.d_data[gesture_data_.index] = \
+                                                            fifo_data[i + 1];
+                        gesture_data_.l_data[gesture_data_.index] = \
+                                                            fifo_data[i + 2];
+                        gesture_data_.r_data[gesture_data_.index] = \
+                                                            fifo_data[i + 3];
+                        gesture_data_.index++;
+                        gesture_data_.total_gestures++;
+                    }
+
+                    /* Filter and process gesture data. Decode near/far state */
+                    if( processGestureData() ) {
+                        if( decodeGesture() ) {
+                            Serial.print("1 ");
+                            switch ( gesture_motion_ ) {
+                              case DIR_UP:
+                                Serial.println("UP");
+                                break;
+                              case DIR_DOWN:
+                                Serial.println("DOWN");
+                                break;
+                              case DIR_LEFT:
+                                Serial.println("LEFT");
+                                break;
+                              case DIR_RIGHT:
+                                Serial.println("RIGHT");
+                                break;
+                              case DIR_NEAR:
+                                Serial.println("NEAR");
+                                break;
+                              case DIR_FAR:
+                                Serial.println("FAR");
+                                break;
+                              default:
+                                Serial.println("NONE");
+                            }
+                        }
+                    }
+                    
+                    /* Reset data */
+                    gesture_data_.index = 0;
+                    gesture_data_.total_gestures = 0;
                 }
-                
-                /* Reset data */
-                gesture_data_.index = 0;
-                gesture_data_.total_gestures = 0;
             }
+        } else {
+    
+            /* Determine best guessed gesture and clean up */
+            delay(FIFO_PAUSE_TIME);
+            if( decodeGesture() ) {
+                Serial.print("2 ");
+                switch ( gesture_motion_ ) {
+                  case DIR_UP:
+                    Serial.println("UP");
+                    break;
+                  case DIR_DOWN:
+                    Serial.println("DOWN");
+                    break;
+                  case DIR_LEFT:
+                    Serial.println("LEFT");
+                    break;
+                  case DIR_RIGHT:
+                    Serial.println("RIGHT");
+                    break;
+                  case DIR_NEAR:
+                    Serial.println("NEAR");
+                    break;
+                  case DIR_FAR:
+                    Serial.println("FAR");
+                    break;
+                  default:
+                    Serial.println("NONE");
+                }
+            }
+            resetGestureParameters();
+            return gesture_motion_;
         }
     }
-    
-    /* Determine best guessed gesture and clean up */
-    delay(FIFO_PAUSE_TIME);
-    decodeGesture();
-    resetGestureParameters();
-    return gesture_motion_;
 }
 
 /*******************************************************************************
