@@ -22,19 +22,17 @@
 /* APDS-9960 I2C address */
 #define APDS9960_I2C_ADDR       0x39
 
+/* Gesture parameters */
+#define GESTURE_THRESHOLD_OUT   10
+#define GESTURE_SENSITIVITY_1   50
+#define GESTURE_SENSITIVITY_2   20
+
 /* Error code for returned values */
 #define ERROR                   0xFF
 
 /* Acceptable device IDs */
 #define APDS9960_ID_1           0xAB
-#define APDS9960_ID_2           0x9C
-
-/* Gesture IDs */
-#define GESTURE_NONE           0
-#define GESTURE_SWIPE_UP       1
-#define GESTURE_SWIPE_DOWN     2
-#define GESTURE_SWIPE_LEFT     3
-#define GESTURE_SWIPE_RIGHT    4    
+#define APDS9960_ID_2           0x9C 
 
 /* Misc parameters */
 #define FIFO_PAUSE_TIME         30      // Wait period (ms) between FIFO reads
@@ -175,13 +173,33 @@
 #define DEFAULT_GPENTH          40      // Threshold for entering gesture mode
 #define DEFAULT_GEXTH           30      // Threshold for exiting gesture mode    
 #define DEFAULT_GCONF1          0x40    // 4 gesture events for int., 1 for exit
-#define DEFAULT_GGAIN           LED_DRIVE_100MA
-#define DEFAULT_GLDRIVE         GGAIN_4X 
+#define DEFAULT_GGAIN           GGAIN_4X
+#define DEFAULT_GLDRIVE         LED_DRIVE_100MA
 #define DEFAULT_GWTIME          GWTIME_2_8MS
 #define DEFAULT_GOFFSET         0       // No offset scaling for gesture mode
 #define DEFAULT_GPULSE          0xC9    // 32us, 10 pulses
 #define DEFAULT_GCONF3          0       // All photodiodes active during gesture
 #define DEFAULT_GIEN            0       // Disable gesture interrupts
+
+/* Direction definitions */
+enum {
+  DIR_NONE,
+  DIR_LEFT,
+  DIR_RIGHT,
+  DIR_UP,
+  DIR_DOWN,
+  DIR_NEAR,
+  DIR_FAR,
+  DIR_ALL
+};
+
+/* State definitions */
+enum {
+  NA_STATE,
+  NEAR_STATE,
+  FAR_STATE,
+  ALL_STATE
+};
 
 /* Container for gesture data */
 typedef struct gesture_data_type {
@@ -199,21 +217,15 @@ typedef struct gesture_data_type {
 class SFE_APDS9960 {
 public:
 
-    /* Constructor and destructor*/
+    /* Configuration */
     SFE_APDS9960();
     ~SFE_APDS9960();
-    
-    /* Initialization*/
     bool init();
-    
-    /* Turn features on and off */
     uint8_t getMode();
     bool setMode(uint8_t mode, uint8_t enable);
     
-    /* Data availability */
+    /* Gesture methods */
     bool isGestureAvailable();
-    
-    /* Get readings from sensors */
     int readGesture();
     
 private:
@@ -221,6 +233,7 @@ private:
     /* Gesture processing */
     void resetGestureParameters();
     bool processGestureData();
+    bool decodeGesture();
 
     /* Proximity Interrupt Threshold */
     uint8_t getProxIntLowThresh();
@@ -281,6 +294,14 @@ private:
 
     /* Members */
     gesture_data_type gesture_data_;
+    int gesture_ud_delta_;
+    int gesture_lr_delta_;
+    int gesture_ud_count_;
+    int gesture_lr_count_;
+    int gesture_near_count_;
+    int gesture_far_count_;
+    int gesture_state_;
+    int gesture_motion_;
 };
 
 #endif
