@@ -46,6 +46,7 @@ Distributed as-is; no warranty is given.
 
 // Global Variables
 SFE_APDS9960 apds = SFE_APDS9960();
+int isr_flag = 0;
 
 void setup() {
 
@@ -69,10 +70,19 @@ void setup() {
 }
 
 void loop() {
-    
-  // See if there is any gesture data available
-  if ( apds.isGestureAvailable() ) {
-/*    switch ( apds.readGesture() ) {
+  if(isr_flag == 1) {
+    handleGesture();
+    isr_flag = 0;
+  }
+}
+
+void interruptRoutine() {
+  isr_flag = 1;
+}
+
+void handleGesture() {
+    if ( apds.isGestureAvailable() ) {
+    switch ( apds.readGesture() ) {
       case DIR_UP:
         Serial.println("UP");
         break;
@@ -93,10 +103,6 @@ void loop() {
         break;
       default:
         Serial.println("NONE");
-    }*/
+    }
   }
-}
-
-void interruptRoutine() {
-
 }

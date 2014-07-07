@@ -322,6 +322,7 @@ int SFE_APDS9960::readGesture()
     uint8_t fifo_level = 0;
     uint8_t fifo_data[128];
     uint8_t gstatus;
+    int motion;
     int i;
     
     /* Make sure that power and gesture is on and data is valid */
@@ -374,29 +375,7 @@ int SFE_APDS9960::readGesture()
                     /* Filter and process gesture data. Decode near/far state */
                     if( processGestureData() ) {
                         if( decodeGesture() ) {
-                            Serial.print("1 ");
-                            switch ( gesture_motion_ ) {
-                              case DIR_UP:
-                                Serial.println("UP");
-                                break;
-                              case DIR_DOWN:
-                                Serial.println("DOWN");
-                                break;
-                              case DIR_LEFT:
-                                Serial.println("LEFT");
-                                break;
-                              case DIR_RIGHT:
-                                Serial.println("RIGHT");
-                                break;
-                              case DIR_NEAR:
-                                Serial.println("NEAR");
-                                break;
-                              case DIR_FAR:
-                                Serial.println("FAR");
-                                break;
-                              default:
-                                Serial.println("NONE");
-                            }
+                            //***TODO: Implement PUSH/LIFT detection */
                         }
                     }
                     
@@ -409,33 +388,10 @@ int SFE_APDS9960::readGesture()
     
             /* Determine best guessed gesture and clean up */
             delay(FIFO_PAUSE_TIME);
-            if( decodeGesture() ) {
-                Serial.print("2 ");
-                switch ( gesture_motion_ ) {
-                  case DIR_UP:
-                    Serial.println("UP");
-                    break;
-                  case DIR_DOWN:
-                    Serial.println("DOWN");
-                    break;
-                  case DIR_LEFT:
-                    Serial.println("LEFT");
-                    break;
-                  case DIR_RIGHT:
-                    Serial.println("RIGHT");
-                    break;
-                  case DIR_NEAR:
-                    Serial.println("NEAR");
-                    break;
-                  case DIR_FAR:
-                    Serial.println("FAR");
-                    break;
-                  default:
-                    Serial.println("NONE");
-                }
-            }
+            decodeGesture();
+            motion = gesture_motion_;
             resetGestureParameters();
-            return gesture_motion_;
+            return motion;
         }
     }
 }
@@ -462,6 +418,7 @@ void SFE_APDS9960::resetGestureParameters()
     gesture_far_count_ = 0;
     
     gesture_state_ = 0;
+    gesture_motion_ = DIR_NONE;
 }
 
 /**
