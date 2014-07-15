@@ -153,7 +153,7 @@
 <text x="8.89" y="2.794" size="0.8128" layer="22" font="vector" ratio="15" rot="MR0" align="bottom-center">SDA</text>
 <text x="11.43" y="2.794" size="0.8128" layer="22" font="vector" ratio="15" rot="MR0" align="bottom-center">SCL</text>
 <text x="13.97" y="2.794" size="0.8128" layer="22" font="vector" ratio="15" rot="MR0" align="bottom-center">INT</text>
-<text x="1.27" y="6.096" size="1.2192" layer="16" font="vector" ratio="15" rot="SMR90" align="center">v02</text>
+<text x="1.27" y="6.096" size="1.2192" layer="16" font="vector" ratio="15" rot="SMR90" align="center">v10</text>
 <text x="7.62" y="12.954" size="0.8128" layer="22" font="vector" ratio="15" rot="MR0" align="bottom-center">APDS-9960</text>
 <text x="13.335" y="8.636" size="0.8128" layer="21" font="vector" ratio="15" rot="R90" align="center-right">I2C</text>
 <text x="7.62" y="11.938" size="0.8128" layer="22" font="vector" ratio="15" rot="MR0" align="bottom-center">RGB/Gesture</text>
