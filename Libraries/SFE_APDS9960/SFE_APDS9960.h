@@ -17,7 +17,7 @@
 #include <Arduino.h>
 
 /* Debug */
-#define DEBUG                   1
+#define DEBUG                   0
 
 /* APDS-9960 I2C address */
 #define APDS9960_I2C_ADDR       0x39
@@ -290,7 +290,7 @@ private:
     bool wireWriteDataByte(uint8_t reg, uint8_t val);
     bool wireWriteDataBlock(uint8_t reg, uint8_t *val, unsigned int len);
     bool wireReadDataByte(uint8_t reg, uint8_t &val);
-    bool wireReadDataBlock(uint8_t reg, uint8_t *val, unsigned int len);
+    int wireReadDataBlock(uint8_t reg, uint8_t *val, unsigned int len);
 
     /* Members */
     gesture_data_type gesture_data_;

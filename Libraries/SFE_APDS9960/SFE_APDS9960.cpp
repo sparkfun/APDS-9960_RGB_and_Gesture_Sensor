@@ -320,6 +320,7 @@ bool SFE_APDS9960::isGestureAvailable()
 int SFE_APDS9960::readGesture()
 {
     uint8_t fifo_level = 0;
+    uint8_t bytes_read = 0;
     uint8_t fifo_data[128];
     uint8_t gstatus;
     int motion;
@@ -348,18 +349,32 @@ int SFE_APDS9960::readGesture()
             if( !wireReadDataByte(APDS9960_GFLVL, fifo_level) ) {
                 return ERROR;
             }
-            
+
+#if DEBUG
+                Serial.print("FIFO Level: ");
+                Serial.println(fifo_level);
+#endif
+
             /* If there's stuff in the FIFO, read it into our data block */
             if( fifo_level > 0) {
-                if( !wireReadDataBlock( APDS9960_GFIFO_U, 
-                                        (uint8_t*)fifo_data, 
-                                        (fifo_level * 4) ) ) {
+                bytes_read = wireReadDataBlock(  APDS9960_GFIFO_U, 
+                                                (uint8_t*)fifo_data, 
+                                                (fifo_level * 4) );
+                if( bytes_read == -1 ) {
                     return ERROR;
                 }
+#if DEBUG
+                Serial.print("FIFO Dump: ");
+                for ( i = 0; i < bytes_read; i++ ) {
+                    Serial.print(fifo_data[i]);
+                    Serial.print(" ");
+                }
+                Serial.println();
+#endif
 
-                /* If there was at least 1 value, sort the data into U/D/L/R */
-                if( fifo_level >= 1 ) {
-                    for( i = 0; i < (fifo_level * 4); i += 4 ) {
+                /* If at least 1 set of data, sort the data into U/D/L/R */
+                if( bytes_read >= 4 ) {
+                    for( i = 0; i < bytes_read; i += 4 ) {
                         gesture_data_.u_data[gesture_data_.index] = \
                                                             fifo_data[i + 0];
                         gesture_data_.d_data[gesture_data_.index] = \
@@ -371,11 +386,23 @@ int SFE_APDS9960::readGesture()
                         gesture_data_.index++;
                         gesture_data_.total_gestures++;
                     }
+                    
+#if DEBUG
+                Serial.print("Up Data: ");
+                for ( i = 0; i < gesture_data_.total_gestures; i++ ) {
+                    Serial.print(gesture_data_.u_data[i]);
+                    Serial.print(" ");
+                }
+                Serial.println();
+#endif
 
                     /* Filter and process gesture data. Decode near/far state */
                     if( processGestureData() ) {
                         if( decodeGesture() ) {
-                            //***TODO: Implement PUSH/LIFT detection */
+                            //***TODO: U-Turn Gestures
+#if DEBUG
+                            //Serial.println(gesture_motion_);
+#endif
                         }
                     }
                     
@@ -390,6 +417,10 @@ int SFE_APDS9960::readGesture()
             delay(FIFO_PAUSE_TIME);
             decodeGesture();
             motion = gesture_motion_;
+#if DEBUG
+            Serial.print("END: ");
+            Serial.println(gesture_motion_);
+#endif
             resetGestureParameters();
             return motion;
         }
@@ -476,6 +507,17 @@ bool SFE_APDS9960::processGestureData()
         }
         /* Find the last value in U/D/L/R above the threshold */
         for( i = gesture_data_.total_gestures - 1; i >= 0; i-- ) {
+#if DEBUG
+            Serial.print(F("Finding last: "));
+            Serial.print(F("U:"));
+            Serial.print(gesture_data_.u_data[i]);
+            Serial.print(F(" D:"));
+            Serial.print(gesture_data_.d_data[i]);
+            Serial.print(F(" L:"));
+            Serial.print(gesture_data_.l_data[i]);
+            Serial.print(F(" R:"));
+            Serial.println(gesture_data_.r_data[i]);
+#endif
             if( (gesture_data_.u_data[i] > GESTURE_THRESHOLD_OUT) &&
                 (gesture_data_.d_data[i] > GESTURE_THRESHOLD_OUT) &&
                 (gesture_data_.l_data[i] > GESTURE_THRESHOLD_OUT) &&
@@ -495,12 +537,34 @@ bool SFE_APDS9960::processGestureData()
     lr_ratio_first = ((l_first - r_first) * 100) / (l_first + r_first);
     ud_ratio_last = ((u_last - d_last) * 100) / (u_last + d_last);
     lr_ratio_last = ((l_last - r_last) * 100) / (l_last + r_last);
-                  
+       
+#if DEBUG
+    Serial.print(F("Last Values: "));
+    Serial.print(F("U:"));
+    Serial.print(u_last);
+    Serial.print(F(" D:"));
+    Serial.print(d_last);
+    Serial.print(F(" L:"));
+    Serial.print(l_last);
+    Serial.print(F(" R:"));
+    Serial.println(r_last);
+
+    Serial.print(F("Ratios: "));
+    Serial.print(F("UD Fi: "));
+    Serial.print(ud_ratio_first);
+    Serial.print(F(" UD La: "));
+    Serial.print(ud_ratio_last);
+    Serial.print(F(" LR Fi: "));
+    Serial.print(lr_ratio_first);
+    Serial.print(F(" LR La: "));
+    Serial.println(lr_ratio_last);
+#endif
+       
     /* Determine the difference between the first and last ratios */
     ud_delta = ud_ratio_last - ud_ratio_first;
     lr_delta = lr_ratio_last - lr_ratio_first;
     
-#if 0
+#if DEBUG
     Serial.print("Deltas: ");
     Serial.print("UD: ");
     Serial.print(ud_delta);
@@ -511,6 +575,14 @@ bool SFE_APDS9960::processGestureData()
     /* Accumulate the UD and LR delta values */
     gesture_ud_delta_ += ud_delta;
     gesture_lr_delta_ += lr_delta;
+    
+#if DEBUG
+    Serial.print("Accumulations: ");
+    Serial.print("UD: ");
+    Serial.print(gesture_ud_delta_);
+    Serial.print(" LR: ");
+    Serial.println(gesture_lr_delta_);
+#endif
     
     /* Determine U/D gesture */
     if( gesture_ud_delta_ >= GESTURE_SENSITIVITY_1 ) {
@@ -567,7 +639,7 @@ bool SFE_APDS9960::processGestureData()
         }
     }
     
-#if 0
+#if DEBUG
     Serial.print("UD_CT: ");
     Serial.print(gesture_ud_count_);
     Serial.print(" LR_CT: ");
@@ -576,6 +648,7 @@ bool SFE_APDS9960::processGestureData()
     Serial.print(gesture_near_count_);
     Serial.print(" FAR_CT: ");
     Serial.println(gesture_far_count_);
+    Serial.println("----------");
 #endif
     
     return false;
@@ -1619,9 +1692,10 @@ bool SFE_APDS9960::wireReadDataByte(uint8_t reg, uint8_t &val)
  *
  * @param[in] reg the register to read from
  * @param[out] val pointer to the beginning of the data
- * @return True if successful read operation. False otherwise.
+ * @param[in] len number of bytes to read
+ * @return Number of bytes read. -1 on read error.
  */
-bool SFE_APDS9960::wireReadDataBlock(   uint8_t reg, 
+int SFE_APDS9960::wireReadDataBlock(   uint8_t reg, 
                                         uint8_t *val, 
                                         unsigned int len)
 {
@@ -1629,18 +1703,18 @@ bool SFE_APDS9960::wireReadDataBlock(   uint8_t reg,
     
     /* Indicate which register we want to read from */
     if (!wireWriteByte(reg)) {
-        return false;
+        return -1;
     }
     
     /* Read block data */
     Wire.requestFrom(APDS9960_I2C_ADDR, len);
     while (Wire.available()) {
         if (i >= len) {
-            return false;
+            return -1;
         }
         val[i] = Wire.read();
         i++;
     }
 
-    return true;
+    return i;
 }
