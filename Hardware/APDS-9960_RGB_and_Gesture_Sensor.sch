@@ -20784,7 +20784,7 @@ Standard SMD solder jumper. Used to automate production. Two varients : Normally
 <sheets>
 <sheet>
 <plain>
-<text x="238.76" y="7.62" size="2.54" layer="94">v02</text>
+<text x="238.76" y="7.62" size="2.54" layer="94">v10</text>
 <text x="172.72" y="12.7" size="2.54" layer="94" align="center-left">Shawn Hymel</text>
 <rectangle x1="69.342" y1="116.332" x2="72.898" y2="117.348" layer="94"/>
 <text x="177.8" y="127" size="1.778" layer="94">I2C Addr: 0x39</text>
