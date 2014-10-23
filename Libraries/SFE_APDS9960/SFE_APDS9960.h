@@ -224,17 +224,31 @@ public:
     uint8_t getMode();
     bool setMode(uint8_t mode, uint8_t enable);
     
+    /* Turn the APDS-9960 on and off */
+    bool enablePower();
+    bool disablePower();
+    
     /* Enable or disable specific sensors */
     bool enableGestureSensor(bool interrupts = true);
     bool disableGestureSensor();
     
-    /* LED and Gain Control */
+    /* LED drive strength control */
     uint8_t getLEDDrive();
     bool setLEDDrive(uint8_t drive);
+    uint8_t getGestureLEDDrive();
+    bool setGestureLEDDrive(uint8_t drive);
+    
+    /* Gain control */
     uint8_t getProxGain();
     bool setProxGain(uint8_t gain);
     uint8_t getAmbientLightGain();
     bool setAmbientLightGain(uint8_t gain);
+    uint8_t getGestureGain();
+    bool setGestureGain(uint8_t gain);
+    
+    /* Get and set interrupts */
+    uint8_t getGestureIntEnable();
+    bool setGestureIntEnable(uint8_t enable);
     
     /* Ambient light methods */
     int readAmbientLight();
@@ -279,16 +293,10 @@ private:
     bool setGestureExitThresh(uint8_t threshold);
     
     /* Gesture LED, gain, and time control */
-    uint8_t getGestureGain();
-    bool setGestureGain(uint8_t gain);
-    uint8_t getGestureLEDDrive();
-    bool setGestureLEDDrive(uint8_t drive);
     uint8_t getGestureWaitTime();
     bool setGestureWaitTime(uint8_t time);
     
-    /* Gesture interrupt enable and mode */
-    uint8_t getGestureIntEnable();
-    bool setGestureIntEnable(uint8_t enable);
+    /* Gesture mode */
     uint8_t getGestureMode();
     bool setGestureMode(uint8_t mode);
 

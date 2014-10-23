@@ -9,6 +9,11 @@
  * This library interfaces the Avago APDS-9960 to Arduino over I2C. The library
  * relies on the Arduino Wire (I2C) library. to use the library, instantiate an
  * APDS9960 object, call init(), and call the appropriate functions.
+ *
+ * APDS-9960 current draw tests (default parameters):
+ *   Off:                   1mA
+ *   Waiting for gesture:   14mA
+ *   Gesture in progress:   35mA
  */
  
  #include <Arduino.h>
@@ -288,7 +293,7 @@ bool SFE_APDS9960::enableGestureSensor(bool interrupts)
     if( !setGestureMode(1) ) {
         return false;
     }
-    if( !setMode(POWER, 1) ) {
+    if( !enablePower() ){
         return false;
     }
     if( !setMode(WAIT, 1) ) {
@@ -463,6 +468,34 @@ int SFE_APDS9960::readGesture()
             return motion;
         }
     }
+}
+
+/**
+ * Turn the APDS-9960 on
+ *
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::enablePower()
+{
+    if( !setMode(POWER, 1) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * Turn the APDS-9960 off
+ *
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::disablePower()
+{
+    if( !setMode(POWER, 0) ) {
+        return false;
+    }
+    
+    return true;
 }
 
 /*******************************************************************************
