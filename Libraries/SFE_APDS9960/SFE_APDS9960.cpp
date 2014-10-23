@@ -158,43 +158,6 @@ bool SFE_APDS9960::init()
         return false;
     }
     
-    /* Enable gesture mode ***move to separate function?*** 
-       Set ENABLE to 0 (power off)
-       Set WTIME to 0xFF
-       Set AUX to LED_BOOST_300
-       Set GCTRL to 0x07 (???)
-       Enable PON, WEN, PEN, GEN in ENABLE 
-    */
-    resetGestureParameters();
-    if( !wireWriteDataByte(APDS9960_WTIME, 0xFF) ) {
-        return false;
-    }
-    if( !wireWriteDataByte(APDS9960_PPULSE, DEFAULT_GESTURE_PPULSE) ) {
-        return false;
-    }
-    if( !setLEDBoost(LED_BOOST_300) ) {
-        return false;
-    }
-    // Clear GFIFO? No such field in new datasheet
-    if( !setGestureIntEnable(1) ) {
-        return false;
-    }
-    if( !setGestureMode(1) ) {
-        return false;
-    }
-    if( !setMode(POWER, 1) ) {
-        return false;
-    }
-    if( !setMode(WAIT, 1) ) {
-        return false;
-    }
-    if( !setMode(PROXIMITY, 1) ) {
-        return false;
-    }
-    if( !setMode(GESTURE, 1) ) {
-        return false;
-    }
-    
 #if 0
     /* Gesture config register dump */
     uint8_t reg;
@@ -222,6 +185,7 @@ bool SFE_APDS9960::init()
         Serial.println(val, HEX);
     }
 #endif
+
     return true;
 }
 
@@ -284,6 +248,80 @@ bool SFE_APDS9960::setMode(uint8_t mode, uint8_t enable)
         return false;
     }
         
+    return true;
+}
+
+/**
+ * @brief Starts the gesture recognition engine on the APDS-9960
+ *
+ * @param[in] interrupts true to enable hardware external interrupt on gesture
+ * @return True if engine enabled correctly. False on error.
+ */
+bool SFE_APDS9960::enableGestureSensor(bool interrupts)
+{
+    
+    /* Enable gesture mode
+       Set ENABLE to 0 (power off)
+       Set WTIME to 0xFF
+       Set AUX to LED_BOOST_300
+       Enable PON, WEN, PEN, GEN in ENABLE 
+    */
+    resetGestureParameters();
+    if( !wireWriteDataByte(APDS9960_WTIME, 0xFF) ) {
+        return false;
+    }
+    if( !wireWriteDataByte(APDS9960_PPULSE, DEFAULT_GESTURE_PPULSE) ) {
+        return false;
+    }
+    if( !setLEDBoost(LED_BOOST_300) ) {
+        return false;
+    }
+    if( interrupts ) {
+        if( !setGestureIntEnable(1) ) {
+            return false;
+        }
+    } else {
+        if( !setGestureIntEnable(0) ) {
+            return false;
+        }
+    }
+    if( !setGestureMode(1) ) {
+        return false;
+    }
+    if( !setMode(POWER, 1) ) {
+        return false;
+    }
+    if( !setMode(WAIT, 1) ) {
+        return false;
+    }
+    if( !setMode(PROXIMITY, 1) ) {
+        return false;
+    }
+    if( !setMode(GESTURE, 1) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Ends the gesture recognition engine on the APDS-9960
+ *
+ * @return True if engine disabled correctly. False on error.
+ */
+bool SFE_APDS9960::disableGestureSensor()
+{
+    resetGestureParameters();
+    if( !setGestureIntEnable(0) ) {
+        return false;
+    }
+    if( !setGestureMode(0) ) {
+        return false;
+    }
+    if( !setMode(GESTURE, 0) ) {
+        return false;
+    }
+    
     return true;
 }
 

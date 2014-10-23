@@ -1,11 +1,11 @@
 /****************************************************************
-AmbientLight.ino
+ColorSense.ino
 APDS-9960 RGB and Gesture Sesnor
 Shawn Hymel @ SparkFun Electronics
-May 30, 2014
+October 15, 2014
 https://github.com/sparkfun/APDS-9960_RGB_and_Gesture_Sensor
 
-Tests the ambient light sensing abilities of the APDS-9960. Configures
+Tests the gesture sensing abilities of the APDS-9960. Configures
 APDS-9960 over I2C and polls the sensor for ambient light data.
 Ambient light levels are displayed over the serial console.
 

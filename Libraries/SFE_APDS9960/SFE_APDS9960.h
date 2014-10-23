@@ -217,12 +217,27 @@ typedef struct gesture_data_type {
 class SFE_APDS9960 {
 public:
 
-    /* Configuration */
+    /* Initialization methods */
     SFE_APDS9960();
     ~SFE_APDS9960();
     bool init();
     uint8_t getMode();
     bool setMode(uint8_t mode, uint8_t enable);
+    
+    /* Enable or disable specific sensors */
+    bool enableGestureSensor(bool interrupts = true);
+    bool disableGestureSensor();
+    
+    /* LED and Gain Control */
+    uint8_t getLEDDrive();
+    bool setLEDDrive(uint8_t drive);
+    uint8_t getProxGain();
+    bool setProxGain(uint8_t gain);
+    uint8_t getAmbientLightGain();
+    bool setAmbientLightGain(uint8_t gain);
+    
+    /* Ambient light methods */
+    int readAmbientLight();
     
     /* Gesture methods */
     bool isGestureAvailable();
@@ -246,14 +261,6 @@ private:
     bool setAmbientLightIntLowThresh(uint16_t threshold);
     uint16_t getAmbientLightIntHighThresh();
     bool setAmbientLightIntHighThresh(uint16_t threshold);
-    
-    /* LED and Gain Control */
-    uint8_t getLEDDrive();
-    bool setLEDDrive(uint8_t drive);
-    uint8_t getProxGain();
-    bool setProxGain(uint8_t gain);
-    uint8_t getAmbientLightGain();
-    bool setAmbientLightGain(uint8_t gain);
     
     /* LED Boost Control */
     uint8_t getLEDBoost();
