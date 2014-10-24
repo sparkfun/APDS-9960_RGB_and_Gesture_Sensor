@@ -257,6 +257,56 @@ bool SFE_APDS9960::setMode(uint8_t mode, uint8_t enable)
 }
 
 /**
+ * @brief Starts the light (R/G/B/Ambient) on the APDS-9960
+ *
+ * @param[in] interrupts true to enable hardware interrupt on high or low light
+ * @return True if sensor enabled correctly. False on error.
+ */
+bool SFE_APDS9960::enableLightSensor(bool interrupts)
+{
+    
+    /* Set default gain, interrupts, enable power, and enable sensor */
+    if( !setAmbientLightGain(DEFAULT_AGAIN) ) {
+        return false;
+    }
+    if( interrupts ) {
+        if( !setAmbientLightIntEnable(1) ) {
+            return false;
+        }
+    } else {
+        if( !setAmbientLightIntEnable(0) ) {
+            return false;
+        }
+    }
+    if( !enablePower() ){
+        return false;
+    }
+    if( !setMode(AMBIENT_LIGHT, 1) ) {
+        return false;
+    }
+    
+    return true;
+
+}
+
+/**
+ * @brief Ends the light sensor on the APDS-9960
+ *
+ * @return True if sensor disabled correctly. False on error.
+ */
+bool SFE_APDS9960::disableLightSensor()
+{
+    if( !setAmbientLightIntEnable(0) ) {
+        return false;
+    }
+    if( !setMode(AMBIENT_LIGHT, 0) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
  * @brief Starts the gesture recognition engine on the APDS-9960
  *
  * @param[in] interrupts true to enable hardware external interrupt on gesture
@@ -496,6 +546,110 @@ bool SFE_APDS9960::disablePower()
     }
     
     return true;
+}
+
+/*******************************************************************************
+ * Ambient light and color sensor controls
+ ******************************************************************************/
+
+/**
+ * @brief Reads the ambient (clear) light level as a 16-bit value
+ *
+ * @return Ambient light level (0 - 65535). -1 on error.
+ */
+int SFE_APDS9960::readAmbientLight()
+{
+    int val;
+    uint8_t val_byte;
+    
+    /* Read value from clear channel, low byte register */
+    if( !wireReadDataByte(APDS9960_CDATAL, val_byte) ) {
+        return -1;
+    }
+    val = val_byte;
+    
+    /* Read value from clear channel, high byte register */
+    if( !wireReadDataByte(APDS9960_CDATAH, val_byte) ) {
+        return -1;
+    }
+    val = ((int)val_byte << 8) + val;
+    
+    return val;
+}
+
+/**
+ * @brief Reads the red light level as a 16-bit value
+ *
+ * @return Red light level (0 - 65535). -1 on error.
+ */
+int SFE_APDS9960::readRedLight()
+{
+    int val;
+    uint8_t val_byte;
+    
+    /* Read value from red channel, low byte register */
+    if( !wireReadDataByte(APDS9960_RDATAL, val_byte) ) {
+        return -1;
+    }
+    val = val_byte;
+    
+    /* Read value from red channel, high byte register */
+    if( !wireReadDataByte(APDS9960_RDATAH, val_byte) ) {
+        return -1;
+    }
+    val = ((int)val_byte << 8) + val;
+    
+    return val;
+}
+
+/**
+ * @brief Reads the green light level as a 16-bit value
+ *
+ * @return Green light level (0 - 65535). -1 on error.
+ */
+int SFE_APDS9960::readGreenLight()
+{
+    int val;
+    uint8_t val_byte;
+    
+    /* Read value from green channel, low byte register */
+    if( !wireReadDataByte(APDS9960_GDATAL, val_byte) ) {
+        return -1;
+    }
+    val = val_byte;
+    
+    /* Read value from green channel, high byte register */
+    if( !wireReadDataByte(APDS9960_GDATAH, val_byte) ) {
+        return -1;
+    }
+    val = ((int)val_byte << 8) + val;
+    
+    return val;
+}
+
+/**
+ * @brief Reads the blue light level as a 16-bit value
+ *
+ * @return Blue light level (0 - 65535). -1 on error.
+ */
+int SFE_APDS9960::readBlueLight()
+{
+    int val;
+    uint8_t val_byte;
+    
+    /* Read value from blue channel, low byte register */
+    if( !wireReadDataByte(APDS9960_BDATAL, val_byte) ) {
+        return -1;
+    }
+    val = val_byte;
+    
+    /* Read value from blue channel, high byte register */
+    if( !wireReadDataByte(APDS9960_BDATAH, val_byte) ) {
+        return -1;
+    }
+    val = ((int)val_byte << 8) + val;
+    
+    return val;
 }
 
 /*******************************************************************************
@@ -1565,6 +1719,55 @@ bool SFE_APDS9960::setGestureWaitTime(uint8_t time)
     
     /* Write register value back into GCONF2 register */
     if( !wireWriteDataByte(APDS9960_GCONF2, val) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Gets if ambient light interrupts are enabled or not
+ *
+ * @return 1 if interrupts are enabled, 0 if not. 0xFF on error.
+ */
+uint8_t SFE_APDS9960::getAmbientLightIntEnable()
+{
+    uint8_t val;
+    
+    /* Read value from ENABLE register */
+    if( !wireReadDataByte(APDS9960_ENABLE, val) ) {
+        return ERROR;
+    }
+    
+    /* Shift and mask out AIEN bit */
+    val = (val >> 4) & 0b00000001;
+    
+    return val;
+}
+
+/**
+ * @brief Turns ambient light interrupts on or off
+ *
+ * @param[in] enable 1 to enable interrupts, 0 to turn them off
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setAmbientLightIntEnable(uint8_t enable)
+{
+    uint8_t val;
+    
+    /* Read value from ENABLE register */
+    if( !wireReadDataByte(APDS9960_ENABLE, val) ) {
+        return false;
+    }
+    
+    /* Set bits in register to given value */
+    enable &= 0b00000001;
+    enable = enable << 4;
+    val &= 0b11101111;
+    val |= enable;
+    
+    /* Write register value back into ENABLE register */
+    if( !wireWriteDataByte(APDS9960_ENABLE, val) ) {
         return false;
     }
     

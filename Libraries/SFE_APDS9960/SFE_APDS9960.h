@@ -162,7 +162,7 @@
 #define DEFAULT_CONFIG1         0x60    // No 12x wait (WTIME) factor
 #define DEFAULT_LDRIVE          LED_DRIVE_100MA
 #define DEFAULT_PGAIN           PGAIN_4X
-#define DEFAULT_AGAIN           AGAIN_1X
+#define DEFAULT_AGAIN           AGAIN_4X
 #define DEFAULT_PILT            0       // Low proximity threshold
 #define DEFAULT_PIHT            50      // High proximity threshold
 #define DEFAULT_AILT            0xFFFF  // Force interrupt for calibration
@@ -229,6 +229,8 @@ public:
     bool disablePower();
     
     /* Enable or disable specific sensors */
+    bool enableLightSensor(bool interrupts = false);
+    bool disableLightSensor();
     bool enableGestureSensor(bool interrupts = true);
     bool disableGestureSensor();
     
@@ -247,11 +249,16 @@ public:
     bool setGestureGain(uint8_t gain);
     
     /* Get and set interrupts */
+    uint8_t getAmbientLightIntEnable();
+    bool setAmbientLightIntEnable(uint8_t enable);
     uint8_t getGestureIntEnable();
     bool setGestureIntEnable(uint8_t enable);
     
     /* Ambient light methods */
     int readAmbientLight();
+    int readRedLight();
+    int readGreenLight();
+    int readBlueLight();
     
     /* Gesture methods */
     bool isGestureAvailable();
