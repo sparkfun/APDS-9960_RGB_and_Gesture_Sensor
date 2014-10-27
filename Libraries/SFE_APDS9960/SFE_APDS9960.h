@@ -249,6 +249,10 @@ public:
     bool setGestureGain(uint8_t gain);
     
     /* Get and set interrupts */
+    bool getLightIntLowThreshold(uint16_t &threshold);
+    bool setLightIntLowThreshold(uint16_t threshold);
+    bool getLightIntHighThreshold(uint16_t &threshold);
+    bool setLightIntHighThreshold(uint16_t threshold);
     uint8_t getAmbientLightIntEnable();
     bool setAmbientLightIntEnable(uint8_t enable);
     uint8_t getGestureIntEnable();
@@ -276,12 +280,6 @@ private:
     bool setProxIntLowThresh(uint8_t threshold);
     uint8_t getProxIntHighThresh();
     bool setProxIntHighThresh(uint8_t threshold);
-    
-    /* Ambient Light Interrupt Threshold */
-    uint16_t getAmbientLightIntLowThresh();
-    bool setAmbientLightIntLowThresh(uint16_t threshold);
-    uint16_t getAmbientLightIntHighThresh();
-    bool setAmbientLightIntHighThresh(uint16_t threshold);
     
     /* LED Boost Control */
     uint8_t getLEDBoost();

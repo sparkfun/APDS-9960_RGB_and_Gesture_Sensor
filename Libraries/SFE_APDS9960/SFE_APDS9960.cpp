@@ -106,10 +106,10 @@ bool SFE_APDS9960::init()
     if( !setProxIntHighThresh(DEFAULT_PIHT) ) {
         return false;
     }
-    if( !setAmbientLightIntLowThresh(DEFAULT_AILT) ) {
+    if( !setLightIntLowThreshold(DEFAULT_AILT) ) {
         return false;
     }
-    if( !setAmbientLightIntHighThresh(DEFAULT_AIHT) ) {
+    if( !setLightIntHighThreshold(DEFAULT_AIHT) ) {
         return false;
     }
     if( !wireWriteDataByte(APDS9960_PERS, DEFAULT_PERS) ) {
@@ -563,18 +563,17 @@ bool SFE_APDS9960::readAmbientLight(uint16_t &val)
     uint8_t val_byte;
     val = 0;
     
-    /* Read value from clear channel, high byte register */
-    if( !wireReadDataByte(APDS9960_CDATAH, val_byte) ) {
-        return false;
-    }
-    val = val_byte;
-    val <<= 8;
-    
     /* Read value from clear channel, low byte register */
     if( !wireReadDataByte(APDS9960_CDATAL, val_byte) ) {
         return false;
     }
-    val += val_byte;
+    val = val_byte;
+    
+    /* Read value from clear channel, high byte register */
+    if( !wireReadDataByte(APDS9960_CDATAH, val_byte) ) {
+        return false;
+    }
+    val = val + ((uint16_t)val_byte << 8);
     
     return true;
 }
@@ -590,18 +589,17 @@ bool SFE_APDS9960::readRedLight(uint16_t &val)
     uint8_t val_byte;
     val = 0;
     
-    /* Read value from clear channel, high byte register */
-    if( !wireReadDataByte(APDS9960_RDATAH, val_byte) ) {
-        return false;
-    }
-    val = val_byte;
-    val <<= 8;
-    
     /* Read value from clear channel, low byte register */
     if( !wireReadDataByte(APDS9960_RDATAL, val_byte) ) {
         return false;
     }
-    val += val_byte;
+    val = val_byte;
+    
+    /* Read value from clear channel, high byte register */
+    if( !wireReadDataByte(APDS9960_RDATAH, val_byte) ) {
+        return false;
+    }
+    val = val + ((uint16_t)val_byte << 8);
     
     return true;
 }
@@ -617,18 +615,17 @@ bool SFE_APDS9960::readGreenLight(uint16_t &val)
     uint8_t val_byte;
     val = 0;
     
-    /* Read value from clear channel, high byte register */
-    if( !wireReadDataByte(APDS9960_GDATAH, val_byte) ) {
-        return false;
-    }
-    val = val_byte;
-    val <<= 8;
-    
     /* Read value from clear channel, low byte register */
     if( !wireReadDataByte(APDS9960_GDATAL, val_byte) ) {
         return false;
     }
-    val += val_byte;
+    val = val_byte;
+    
+    /* Read value from clear channel, high byte register */
+    if( !wireReadDataByte(APDS9960_GDATAH, val_byte) ) {
+        return false;
+    }
+    val = val + ((uint16_t)val_byte << 8);
     
     return true;
 }
@@ -644,18 +641,17 @@ bool SFE_APDS9960::readBlueLight(uint16_t &val)
     uint8_t val_byte;
     val = 0;
     
-    /* Read value from clear channel, high byte register */
-    if( !wireReadDataByte(APDS9960_BDATAH, val_byte) ) {
-        return false;
-    }
-    val = val_byte;
-    val <<= 8;
-    
     /* Read value from clear channel, low byte register */
     if( !wireReadDataByte(APDS9960_BDATAL, val_byte) ) {
         return false;
     }
-    val += val_byte;
+    val = val_byte;
+    
+    /* Read value from clear channel, high byte register */
+    if( !wireReadDataByte(APDS9960_BDATAH, val_byte) ) {
+        return false;
+    }
+    val = val + ((uint16_t)val_byte << 8);
     
     return true;
 }
@@ -946,120 +942,6 @@ bool SFE_APDS9960::decodeGesture()
 /*******************************************************************************
  * Getters and setters for register values
  ******************************************************************************/
-
-/**
- * @brief Returns the lower threshold for the ambient light sensor
- *
- * @return lower threshold
- */
-uint16_t SFE_APDS9960::getAmbientLightIntLowThresh()
-{
-    uint16_t val;
-    uint8_t val_low;
-    uint8_t val_high;
-    
-    /* Read lower byte */
-    if( !wireReadDataByte(APDS9960_AILTL, val_low) ) {
-        val_low = 0;
-    }
-    
-    /* Read high byte */
-    if( !wireReadDataByte(APDS9960_AILTH, val_high) ) {
-        val_high = 0;
-    }
-    
-    /* Combine into 16-bit value */
-    val = (uint16_t) val_high;
-    val = val << 8;
-    val |= val_low;
-    
-    return val;
-}
-
-/**
- * @brief Sets the low threshold for the ambient light sensor
- *
- * @param[in] threshold the low light threshold
- * @return True if operation successful. False otherwise.
- */
-bool SFE_APDS9960::setAmbientLightIntLowThresh(uint16_t threshold)
-{
-    uint8_t val_low;
-    uint8_t val_high;
-    
-    /* Break 16-bit threshold into 2 8-bit values */
-    val_low = threshold & 0x00FF;
-    val_high = (threshold & 0xFF00) >> 8;
-    
-    /* Write high byte */
-    if( !wireWriteDataByte(APDS9960_AILTH, val_high) ) {
-        return false;
-    }
-    
-    /* Write low byte */
-    if( !wireWriteDataByte(APDS9960_AILTL, val_low) ) {
-        return false;
-    }
-    
-    return true;
-}
-
-/**
- * @brief Returns the high threshold for the ambient light sensor
- *
- * @return high threshold
- */
-uint16_t SFE_APDS9960::getAmbientLightIntHighThresh()
-{
-    uint16_t val;
-    uint8_t val_low;
-    uint8_t val_high;
-    
-    /* Read lower byte */
-    if( !wireReadDataByte(APDS9960_AIHTL, val_low) ) {
-        val_low = 0;
-    }
-    
-    /* Read high byte */
-    if( !wireReadDataByte(APDS9960_AIHTH, val_high) ) {
-        val_high = 0;
-    }
-    
-    /* Combine into 16-bit value */
-    val = (uint16_t) val_high;
-    val = val << 8;
-    val |= val_low;
-    
-    return val;
-}
-
-/**
- * @brief Sets the high threshold for the ambient light sensor
- *
- * @param[in] threshold the high light threshold
- * @return True if operation successful. False otherwise.
- */
-bool SFE_APDS9960::setAmbientLightIntHighThresh(uint16_t threshold)
-{
-    uint8_t val_low;
-    uint8_t val_high;
-    
-    /* Break 16-bit threshold into 2 8-bit values */
-    val_low = threshold & 0x00FF;
-    val_high = (threshold & 0xFF00) >> 8;
-    
-    /* Write high byte */
-    if( !wireWriteDataByte(APDS9960_AIHTH, val_high) ) {
-        return false;
-    }
-    
-    /* Write low byte */
-    if( !wireWriteDataByte(APDS9960_AIHTL, val_low) ) {
-        return false;
-    }
-    
-    return true;
-}
 
 /**
  * @brief Returns the lower threshold for proximity detection
@@ -1732,6 +1614,120 @@ bool SFE_APDS9960::setGestureWaitTime(uint8_t time)
     
     return true;
 }
+
+/**
+ * @brief Gets the low threshold for ambient light interrupts
+ *
+ * @param[out] threshold current low threshold stored on the APDS-9960
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::getLightIntLowThreshold(uint16_t &threshold)
+{
+    uint8_t val_byte;
+    threshold = 0;
+    
+    /* Read value from ambient light high threshold, low byte register */
+    if( !wireReadDataByte(APDS9960_AILTL, val_byte) ) {
+        return false;
+    }
+    threshold = val_byte;
+    
+    /* Read value from ambient light high threshold, high byte register */
+    if( !wireReadDataByte(APDS9960_AILTH, val_byte) ) {
+        return false;
+    }
+    threshold = threshold + ((uint16_t)val_byte << 8);
+    
+    return true;
+}
+
+/**
+ * @brief Sets the low threshold for ambient light interrupts
+ *
+ * @param[in] threshold low threshold value for interrupt to trigger
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setLightIntLowThreshold(uint16_t threshold)
+{
+    uint8_t val_low;
+    uint8_t val_high;
+    
+    /* Break 16-bit threshold into 2 8-bit values */
+    val_low = threshold & 0x00FF;
+    val_high = (threshold & 0xFF00) >> 8;
+    
+    /* Write low byte */
+    if( !wireWriteDataByte(APDS9960_AILTL, val_low) ) {
+        return false;
+    }
+    
+    /* Write high byte */
+    if( !wireWriteDataByte(APDS9960_AILTH, val_high) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Gets the high threshold for ambient light interrupts
+ *
+ * @param[out] threshold current low threshold stored on the APDS-9960
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::getLightIntHighThreshold(uint16_t &threshold)
+{
+    uint8_t val_byte;
+    threshold = 0;
+    
+    /* Read value from ambient light high threshold, low byte register */
+    if( !wireReadDataByte(APDS9960_AIHTL, val_byte) ) {
+        return false;
+    }
+    threshold = val_byte;
+    
+    /* Read value from ambient light high threshold, high byte register */
+    if( !wireReadDataByte(APDS9960_AIHTH, val_byte) ) {
+        return false;
+    }
+    threshold = threshold + ((uint16_t)val_byte << 8);
+    
+    return true;
+}
+
+/**
+ * @brief Sets the high threshold for ambient light interrupts
+ *
+ * @param[in] threshold high threshold value for interrupt to trigger
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setLightIntHighThreshold(uint16_t threshold)
+{
+    uint8_t val_low;
+    uint8_t val_high;
+    
+    /* Break 16-bit threshold into 2 8-bit values */
+    val_low = threshold & 0x00FF;
+    val_high = (threshold & 0xFF00) >> 8;
+    
+    /* Write low byte */
+    if( !wireWriteDataByte(APDS9960_AIHTL, val_low) ) {
+        return false;
+    }
+    
+    /* Write high byte */
+    if( !wireWriteDataByte(APDS9960_AIHTH, val_high) ) {
+        return false;
+    }
+    
+    return true;
+}
+ 
+ 
+ /*    uint16_t getLightHighThreshold();
+    uint16_t getLightLowThreshold();
+    bool setLightHighThreshold(uint16_t threshold);
+    bool setLightLowThreshold(uint16_t threshold);*/
 
 /**
  * @brief Gets if ambient light interrupts are enabled or not
