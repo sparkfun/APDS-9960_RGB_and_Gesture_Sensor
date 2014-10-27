@@ -255,10 +255,10 @@ public:
     bool setGestureIntEnable(uint8_t enable);
     
     /* Ambient light methods */
-    int readAmbientLight();
-    int readRedLight();
-    int readGreenLight();
-    int readBlueLight();
+    bool readAmbientLight(uint16_t &val);
+    bool readRedLight(uint16_t &val);
+    bool readGreenLight(uint16_t &val);
+    bool readBlueLight(uint16_t &val);
     
     /* Gesture methods */
     bool isGestureAvailable();

@@ -1,13 +1,13 @@
 /****************************************************************
-AmbientLight.ino
+AmbientLightInterrupt.ino
 APDS-9960 RGB and Gesture Sesnor
 Shawn Hymel @ SparkFun Electronics
-May 30, 2014
+October 24, 2014
 https://github.com/sparkfun/APDS-9960_RGB_and_Gesture_Sensor
 
-Tests the ambient light sensing abilities of the APDS-9960. Configures
-APDS-9960 over I2C and polls the sensor for ambient light data.
-Ambient light levels are displayed over the serial console.
+Tests the ambient light interrupt abilities of the APDS-9960.
+Configures the APDS-9960 over I2C and waits for an external
+interrupt based on high or low light conditions.
 
 Hardware Connections:
 
@@ -35,3 +35,27 @@ buy us a round!
 Distributed as-is; no warranty is given.
 ****************************************************************/
 
+#include <Wire.h>
+#include <SFE_APDS9960.h>
+
+// Pins
+#define APDS9960_INT    2 // Needs to be an interrupt pin
+
+// Constants
+#define LIGHT_INT_HIGH  500  // High light level for interrupt
+#define LIGHT_INT_LOW   10   // Low light level for interrupt
+
+// Global variables
+SFE_APDS9960 apds = SFE_APDS9960();
+int isr_flag = 0;
+
+void setup() {
+  
+  // Initialize Serial port
+  Serial.begin(115200);
+  Serial.println();
+  Serial.println(F("--------------------------------"));
+  Serial.println(F("SparkFun APDS-9960 - GestureTest"));
+  Serial.println(F("--------------------------------"));
+  
+  

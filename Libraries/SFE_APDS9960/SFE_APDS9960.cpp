@@ -555,101 +555,109 @@ bool SFE_APDS9960::disablePower()
 /**
  * @brief Reads the ambient (clear) light level as a 16-bit value
  *
- * @return Ambient light level (0 - 65535). -1 on error.
+ * @param[out] val value of the light sensor.
+ * @return True if operation successful. False otherwise.
  */
-int SFE_APDS9960::readAmbientLight()
+bool SFE_APDS9960::readAmbientLight(uint16_t &val)
 {
-    int val;
     uint8_t val_byte;
-    
-    /* Read value from clear channel, low byte register */
-    if( !wireReadDataByte(APDS9960_CDATAL, val_byte) ) {
-        return -1;
-    }
-    val = val_byte;
+    val = 0;
     
     /* Read value from clear channel, high byte register */
     if( !wireReadDataByte(APDS9960_CDATAH, val_byte) ) {
-        return -1;
+        return false;
     }
-    val = ((int)val_byte << 8) + val;
+    val = val_byte;
+    val <<= 8;
     
-    return val;
+    /* Read value from clear channel, low byte register */
+    if( !wireReadDataByte(APDS9960_CDATAL, val_byte) ) {
+        return false;
+    }
+    val += val_byte;
+    
+    return true;
 }
 
 /**
  * @brief Reads the red light level as a 16-bit value
  *
- * @return Red light level (0 - 65535). -1 on error.
+ * @param[out] val value of the light sensor.
+ * @return True if operation successful. False otherwise.
  */
-int SFE_APDS9960::readRedLight()
+bool SFE_APDS9960::readRedLight(uint16_t &val)
 {
-    int val;
     uint8_t val_byte;
+    val = 0;
     
-    /* Read value from red channel, low byte register */
-    if( !wireReadDataByte(APDS9960_RDATAL, val_byte) ) {
-        return -1;
+    /* Read value from clear channel, high byte register */
+    if( !wireReadDataByte(APDS9960_RDATAH, val_byte) ) {
+        return false;
     }
     val = val_byte;
+    val <<= 8;
     
-    /* Read value from red channel, high byte register */
-    if( !wireReadDataByte(APDS9960_RDATAH, val_byte) ) {
-        return -1;
+    /* Read value from clear channel, low byte register */
+    if( !wireReadDataByte(APDS9960_RDATAL, val_byte) ) {
+        return false;
     }
-    val = ((int)val_byte << 8) + val;
+    val += val_byte;
     
-    return val;
+    return true;
 }
-
+ 
 /**
  * @brief Reads the green light level as a 16-bit value
  *
- * @return Green light level (0 - 65535). -1 on error.
+ * @param[out] val value of the light sensor.
+ * @return True if operation successful. False otherwise.
  */
-int SFE_APDS9960::readGreenLight()
+bool SFE_APDS9960::readGreenLight(uint16_t &val)
 {
-    int val;
     uint8_t val_byte;
+    val = 0;
     
-    /* Read value from green channel, low byte register */
-    if( !wireReadDataByte(APDS9960_GDATAL, val_byte) ) {
-        return -1;
+    /* Read value from clear channel, high byte register */
+    if( !wireReadDataByte(APDS9960_GDATAH, val_byte) ) {
+        return false;
     }
     val = val_byte;
+    val <<= 8;
     
-    /* Read value from green channel, high byte register */
-    if( !wireReadDataByte(APDS9960_GDATAH, val_byte) ) {
-        return -1;
+    /* Read value from clear channel, low byte register */
+    if( !wireReadDataByte(APDS9960_GDATAL, val_byte) ) {
+        return false;
     }
-    val = ((int)val_byte << 8) + val;
+    val += val_byte;
     
-    return val;
+    return true;
 }
 
 /**
- * @brief Reads the blue light level as a 16-bit value
+ * @brief Reads the red light level as a 16-bit value
  *
- * @return Blue light level (0 - 65535). -1 on error.
+ * @param[out] val value of the light sensor.
+ * @return True if operation successful. False otherwise.
  */
-int SFE_APDS9960::readBlueLight()
+bool SFE_APDS9960::readBlueLight(uint16_t &val)
 {
-    int val;
     uint8_t val_byte;
+    val = 0;
     
-    /* Read value from blue channel, low byte register */
-    if( !wireReadDataByte(APDS9960_BDATAL, val_byte) ) {
-        return -1;
+    /* Read value from clear channel, high byte register */
+    if( !wireReadDataByte(APDS9960_BDATAH, val_byte) ) {
+        return false;
     }
     val = val_byte;
+    val <<= 8;
     
-    /* Read value from blue channel, high byte register */
-    if( !wireReadDataByte(APDS9960_BDATAH, val_byte) ) {
-        return -1;
+    /* Read value from clear channel, low byte register */
+    if( !wireReadDataByte(APDS9960_BDATAL, val_byte) ) {
+        return false;
     }
-    val = ((int)val_byte << 8) + val;
+    val += val_byte;
     
-    return val;
+    return true;
 }
 
 /*******************************************************************************

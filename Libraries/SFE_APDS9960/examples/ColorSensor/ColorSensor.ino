@@ -40,10 +40,10 @@ Distributed as-is; no warranty is given.
 
 // Global Variables
 SFE_APDS9960 apds = SFE_APDS9960();
-int ambient_light = 0;
-int red_light = 0;
-int green_light = 0;
-int blue_light = 0;
+uint16_t ambient_light = 0;
+uint16_t red_light = 0;
+uint16_t green_light = 0;
+uint16_t blue_light = 0;
 
 void setup() {
   
@@ -67,20 +67,19 @@ void setup() {
   } else {
     Serial.println(F("Something went wrong during light sensor init!"));
   }
+  
+  // Wait for initialization and calibration to finish
+  delay(500);
 }
 
 void loop() {
   
   // Read the light levels (ambient, red, green, blue)
-  ambient_light = apds.readAmbientLight();
-  red_light = apds.readRedLight();
-  green_light = apds.readGreenLight();
-  blue_light = apds.readBlueLight();
-  
-  // Check if light readings were valid and display them
-  if ( (ambient_light == -1) || (red_light == -1) ||
-        (green_light == -1) || (blue_light == -1) ) {
-    Serial.println("Error reading light values");
+  if (  !apds.readAmbientLight(ambient_light) ||
+        !apds.readRedLight(red_light) ||
+        !apds.readGreenLight(green_light) ||
+        !apds.readBlueLight(blue_light) ) {
+    Serial.println("Error reading ambient light value");
   } else {
     Serial.print("Ambient: ");
     Serial.print(ambient_light);
