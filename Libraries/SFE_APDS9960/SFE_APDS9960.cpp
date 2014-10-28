@@ -94,7 +94,7 @@ bool SFE_APDS9960::init()
     if( !setLEDDrive(DEFAULT_LDRIVE) ) {
         return false;
     }
-    if( !setProxGain(DEFAULT_PGAIN) ) {
+    if( !setProximityGain(DEFAULT_PGAIN) ) {
         return false;
     }
     if( !setAmbientLightGain(DEFAULT_AGAIN) ) {
@@ -257,7 +257,7 @@ bool SFE_APDS9960::setMode(uint8_t mode, uint8_t enable)
 }
 
 /**
- * @brief Starts the light (R/G/B/Ambient) on the APDS-9960
+ * @brief Starts the light (R/G/B/Ambient) sensor on the APDS-9960
  *
  * @param[in] interrupts true to enable hardware interrupt on high or low light
  * @return True if sensor enabled correctly. False on error.
@@ -305,6 +305,41 @@ bool SFE_APDS9960::disableLightSensor()
     
     return true;
 }
+
+/**
+ * @brief Starts the proximity sensor on the APDS-9960
+ *
+ * @param[in] interrupts true to enable hardware external interrupt on proximity
+ * @return True if sensor enabled correctly. False on error.
+ */
+bool SFE_APDS9960::enableProximitySensor(bool interrupts)
+{
+    /* Set default gain, LED, interrupts, enable power, and enable sensor */
+    if( !setProximityGain(DEFAULT_PGAIN) ) {
+        return false;
+    }
+    if( !setLEDDrive(DEFAULT_LDRIVE) ) {
+        return false;
+    }
+    if( interrupts ) {
+        if( !setProximityIntEnable(1) ) {
+            return false;
+        }
+    } else {
+        if( !setProximityIntEnable(0) ) {
+            return false;
+        }
+    }
+    if( !enablePower() ){
+        return false;
+    }
+    if( !setMode(PROXIMITY, 1) ) {
+        return false;
+    }
+    
+    return true;
+}
+    bool disableProximitySensor();
 
 /**
  * @brief Starts the gesture recognition engine on the APDS-9960
@@ -444,8 +479,8 @@ int SFE_APDS9960::readGesture()
             }
 
 #if DEBUG
-                Serial.print("FIFO Level: ");
-                Serial.println(fifo_level);
+            Serial.print("FIFO Level: ");
+            Serial.println(fifo_level);
 #endif
 
             /* If there's stuff in the FIFO, read it into our data block */
@@ -652,6 +687,28 @@ bool SFE_APDS9960::readBlueLight(uint16_t &val)
         return false;
     }
     val = val + ((uint16_t)val_byte << 8);
+    
+    return true;
+}
+
+/*******************************************************************************
+ * Proximity sensor controls
+ ******************************************************************************/
+
+/**
+ * @brief Reads the proximity level as an 8-bit value
+ *
+ * @param[out] val value of the proximity sensor.
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::readProximity(uint8_t &val)
+{
+    val = 0;
+    
+    /* Read value from proximity data register */
+    if( !wireReadDataByte(APDS9960_PDATA, val) ) {
+        return false;
+    }
     
     return true;
 }
@@ -1079,7 +1136,7 @@ bool SFE_APDS9960::setLEDDrive(uint8_t drive)
  *
  * @return the value of the proximity gain. 0xFF on failure.
  */
-uint8_t SFE_APDS9960::getProxGain()
+uint8_t SFE_APDS9960::getProximityGain()
 {
     uint8_t val;
     
@@ -1106,7 +1163,7 @@ uint8_t SFE_APDS9960::getProxGain()
  * @param[in] drive the value (0-3) for the gain
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setProxGain(uint8_t drive)
+bool SFE_APDS9960::setProximityGain(uint8_t drive)
 {
     uint8_t val;
     
@@ -1626,13 +1683,13 @@ bool SFE_APDS9960::getLightIntLowThreshold(uint16_t &threshold)
     uint8_t val_byte;
     threshold = 0;
     
-    /* Read value from ambient light high threshold, low byte register */
+    /* Read value from ambient light low threshold, low byte register */
     if( !wireReadDataByte(APDS9960_AILTL, val_byte) ) {
         return false;
     }
     threshold = val_byte;
     
-    /* Read value from ambient light high threshold, high byte register */
+    /* Read value from ambient light low threshold, high byte register */
     if( !wireReadDataByte(APDS9960_AILTH, val_byte) ) {
         return false;
     }
@@ -1722,12 +1779,76 @@ bool SFE_APDS9960::setLightIntHighThreshold(uint16_t threshold)
     
     return true;
 }
- 
- 
- /*    uint16_t getLightHighThreshold();
-    uint16_t getLightLowThreshold();
-    bool setLightHighThreshold(uint16_t threshold);
-    bool setLightLowThreshold(uint16_t threshold);*/
+
+/**
+ * @brief Gets the low threshold for proximity interrupts
+ *
+ * @param[out] threshold current low threshold stored on the APDS-9960
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::getProximityIntLowThreshold(uint8_t &threshold)
+{
+    threshold = 0;
+    
+    /* Read value from proximity low threshold register */
+    if( !wireReadDataByte(APDS9960_PILT, threshold) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Sets the low threshold for proximity interrupts
+ *
+ * @param[in] threshold low threshold value for interrupt to trigger
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setProximityIntLowThreshold(uint8_t threshold)
+{
+    
+    /* Write threshold value to register */
+    if( !wireWriteDataByte(APDS9960_PILT, threshold) ) {
+        return false;
+    }
+    
+    return true;
+}
+    
+/**
+ * @brief Gets the high threshold for proximity interrupts
+ *
+ * @param[out] threshold current low threshold stored on the APDS-9960
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::getProximityIntHighThreshold(uint8_t &threshold)
+{
+    threshold = 0;
+    
+    /* Read value from proximity low threshold register */
+    if( !wireReadDataByte(APDS9960_PIHT, threshold) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Sets the high threshold for proximity interrupts
+ *
+ * @param[in] threshold high threshold value for interrupt to trigger
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setProximityIntHighThreshold(uint8_t threshold)
+{
+    
+    /* Write threshold value to register */
+    if( !wireWriteDataByte(APDS9960_PIHT, threshold) ) {
+        return false;
+    }
+    
+    return true;
+}
 
 /**
  * @brief Gets if ambient light interrupts are enabled or not
@@ -1768,6 +1889,55 @@ bool SFE_APDS9960::setAmbientLightIntEnable(uint8_t enable)
     enable &= 0b00000001;
     enable = enable << 4;
     val &= 0b11101111;
+    val |= enable;
+    
+    /* Write register value back into ENABLE register */
+    if( !wireWriteDataByte(APDS9960_ENABLE, val) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Gets if proximity interrupts are enabled or not
+ *
+ * @return 1 if interrupts are enabled, 0 if not. 0xFF on error.
+ */
+uint8_t SFE_APDS9960::getProximityIntEnable()
+{
+    uint8_t val;
+    
+    /* Read value from ENABLE register */
+    if( !wireReadDataByte(APDS9960_ENABLE, val) ) {
+        return ERROR;
+    }
+    
+    /* Shift and mask out PIEN bit */
+    val = (val >> 5) & 0b00000001;
+    
+    return val;
+}
+
+/**
+ * @brief Turns proximity interrupts on or off
+ *
+ * @param[in] enable 1 to enable interrupts, 0 to turn them off
+ * @return True if operation successful. False otherwise.
+ */
+bool SFE_APDS9960::setProximityIntEnable(uint8_t enable)
+{
+    uint8_t val;
+    
+    /* Read value from ENABLE register */
+    if( !wireReadDataByte(APDS9960_ENABLE, val) ) {
+        return false;
+    }
+    
+    /* Set bits in register to given value */
+    enable &= 0b00000001;
+    enable = enable << 5;
+    val &= 0b11011111;
     val |= enable;
     
     /* Write register value back into ENABLE register */
@@ -1821,6 +1991,36 @@ bool SFE_APDS9960::setGestureIntEnable(uint8_t enable)
     
     /* Write register value back into GCONF4 register */
     if( !wireWriteDataByte(APDS9960_GCONF4, val) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Clears the ambient light interrupt
+ *
+ * @return True if operation completed successfully. False otherwise.
+ */
+bool SFE_APDS9960::clearAmbientLightInt()
+{
+    uint8_t throwaway;
+    if( !wireReadDataByte(APDS9960_AICLEAR, throwaway) ) {
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * @brief Clears the proximity interrupt
+ *
+ * @return True if operation completed successfully. False otherwise.
+ */
+bool SFE_APDS9960::clearProximityInt()
+{
+    uint8_t throwaway;
+    if( !wireReadDataByte(APDS9960_PICLEAR, throwaway) ) {
         return false;
     }
     

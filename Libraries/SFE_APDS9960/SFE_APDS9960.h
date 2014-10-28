@@ -167,7 +167,7 @@
 #define DEFAULT_PIHT            50      // High proximity threshold
 #define DEFAULT_AILT            0xFFFF  // Force interrupt for calibration
 #define DEFAULT_AIHT            0
-#define DEFAULT_PERS            0x22    // 2 consecutive prox or ALS for int.
+#define DEFAULT_PERS            0x11    // 2 consecutive prox or ALS for int.
 #define DEFAULT_CONFIG2         0x01    // No saturation interrupts or LED boost  
 #define DEFAULT_CONFIG3         0       // Enable all photodiodes, no SAI
 #define DEFAULT_GPENTH          40      // Threshold for entering gesture mode
@@ -231,6 +231,8 @@ public:
     /* Enable or disable specific sensors */
     bool enableLightSensor(bool interrupts = false);
     bool disableLightSensor();
+    bool enableProximitySensor(bool interrupts = false);
+    bool disableProximitySensor();
     bool enableGestureSensor(bool interrupts = true);
     bool disableGestureSensor();
     
@@ -241,28 +243,45 @@ public:
     bool setGestureLEDDrive(uint8_t drive);
     
     /* Gain control */
-    uint8_t getProxGain();
-    bool setProxGain(uint8_t gain);
     uint8_t getAmbientLightGain();
     bool setAmbientLightGain(uint8_t gain);
+    uint8_t getProximityGain();
+    bool setProximityGain(uint8_t gain);
     uint8_t getGestureGain();
     bool setGestureGain(uint8_t gain);
     
-    /* Get and set interrupts */
+    /* Get and set light interrupt thresholds */
     bool getLightIntLowThreshold(uint16_t &threshold);
     bool setLightIntLowThreshold(uint16_t threshold);
     bool getLightIntHighThreshold(uint16_t &threshold);
     bool setLightIntHighThreshold(uint16_t threshold);
+    
+    /* Get and set proximity interrupt thresholds */
+    bool getProximityIntLowThreshold(uint8_t &threshold);
+    bool setProximityIntLowThreshold(uint8_t threshold);
+    bool getProximityIntHighThreshold(uint8_t &threshold);
+    bool setProximityIntHighThreshold(uint8_t threshold);
+    
+    /* Get and set interrupt enables */
     uint8_t getAmbientLightIntEnable();
     bool setAmbientLightIntEnable(uint8_t enable);
+    uint8_t getProximityIntEnable();
+    bool setProximityIntEnable(uint8_t enable);
     uint8_t getGestureIntEnable();
     bool setGestureIntEnable(uint8_t enable);
+    
+    /* Clear interrupts */
+    bool clearAmbientLightInt();
+    bool clearProximityInt();
     
     /* Ambient light methods */
     bool readAmbientLight(uint16_t &val);
     bool readRedLight(uint16_t &val);
     bool readGreenLight(uint16_t &val);
     bool readBlueLight(uint16_t &val);
+    
+    /* Proximity methods */
+    bool readProximity(uint8_t &val);
     
     /* Gesture methods */
     bool isGestureAvailable();

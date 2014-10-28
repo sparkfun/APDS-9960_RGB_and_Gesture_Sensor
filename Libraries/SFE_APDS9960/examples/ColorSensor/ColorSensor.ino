@@ -1,6 +1,6 @@
 /****************************************************************
 ColorSensor.ino
-APDS-9960 RGB and Gesture Sesnor
+APDS-9960 RGB and Gesture Sensor
 Shawn Hymel @ SparkFun Electronics
 October 15, 2014
 https://github.com/sparkfun/APDS-9960_RGB_and_Gesture_Sensor
@@ -48,7 +48,7 @@ uint16_t blue_light = 0;
 void setup() {
   
   // Initialize Serial port
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println();
   Serial.println(F("--------------------------------"));
   Serial.println(F("SparkFun APDS-9960 - ColorSensor"));
@@ -79,7 +79,7 @@ void loop() {
         !apds.readRedLight(red_light) ||
         !apds.readGreenLight(green_light) ||
         !apds.readBlueLight(blue_light) ) {
-    Serial.println("Error reading ambient light value");
+    Serial.println("Error reading light values");
   } else {
     Serial.print("Ambient: ");
     Serial.print(ambient_light);

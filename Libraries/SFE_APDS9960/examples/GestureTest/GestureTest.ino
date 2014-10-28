@@ -1,6 +1,6 @@
 /****************************************************************
 GestureTest.ino
-APDS-9960 RGB and Gesture Sesnor
+APDS-9960 RGB and Gesture Sensor
 Shawn Hymel @ SparkFun Electronics
 May 30, 2014
 https://github.com/sparkfun/APDS-9960_RGB_and_Gesture_Sensor
@@ -8,7 +8,16 @@ https://github.com/sparkfun/APDS-9960_RGB_and_Gesture_Sensor
 Tests the gesture sensing abilities of the APDS-9960. Configures
 APDS-9960 over I2C and waits for gesture events. Calculates the
 direction of the swipe (up, down, left, right) and displays it
-on a serial console.
+on a serial console. 
+
+To perform a NEAR gesture, hold your hand
+far above the sensor and move it close to the sensor (within 2
+inches). Hold your hand there for at least 1 second and move it
+away.
+
+To perform a FAR gesture, hold your hand within 2 inches of the
+sensor for at least 1 second and then move it above (out of
+range) of the sensor.
 
 Hardware Connections:
 
@@ -51,7 +60,7 @@ int isr_flag = 0;
 void setup() {
 
   // Initialize Serial port
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println();
   Serial.println(F("--------------------------------"));
   Serial.println(F("SparkFun APDS-9960 - GestureTest"));
@@ -76,7 +85,7 @@ void setup() {
 }
 
 void loop() {
-  if(isr_flag == 1) {
+  if( isr_flag == 1 ) {
     handleGesture();
     isr_flag = 0;
   }
