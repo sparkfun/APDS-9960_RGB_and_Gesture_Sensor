@@ -16,7 +16,7 @@ Getting Started
 
 * Download the Git repository as a ZIP ("Download ZIP" button)
 * Unzip
-* Copy the entire library directorey (SFE_APDS9960) to <Arduino installation directory>/libraries
+* Copy the entire library directory (SFE_APDS9960) to \<Arduino installation directory\>/libraries
 * Open the Arduino program
 * Select File -> Examples -> SFE_APDS9960 -> GestureTest
 * Plug in your Arduino and APDS-9960 with the following connections
