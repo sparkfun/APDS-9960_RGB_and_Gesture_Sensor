@@ -1,5 +1,5 @@
 /**
- * @file    SFE_APDS-9960.cpp
+ * @file    SparkFun_APDS-9960.cpp
  * @brief   Library for the SparkFun APDS-9960 breakout board
  * @author  Shawn Hymel (SparkFun Electronics)
  *
@@ -19,12 +19,12 @@
  #include <Arduino.h>
  #include <Wire.h>
  
- #include "SFE_APDS9960.h"
+ #include "SparkFun_APDS9960.h"
  
 /**
- * @brief Constructor - Instantiates SFE_APDS9960 object
+ * @brief Constructor - Instantiates SparkFun_APDS9960 object
  */
-SFE_APDS9960::SFE_APDS9960()
+SparkFun_APDS9960::SparkFun_APDS9960()
 {
     gesture_ud_delta_ = 0;
     gesture_lr_delta_ = 0;
@@ -42,7 +42,7 @@ SFE_APDS9960::SFE_APDS9960()
 /**
  * @brief Destructor
  */
-SFE_APDS9960::~SFE_APDS9960()
+SparkFun_APDS9960::~SparkFun_APDS9960()
 {
 
 }
@@ -52,7 +52,7 @@ SFE_APDS9960::~SFE_APDS9960()
  *
  * @return True if initialized successfully. False otherwise.
  */
-bool SFE_APDS9960::init()
+bool SparkFun_APDS9960::init()
 {
     uint8_t id;
 
@@ -203,7 +203,7 @@ bool SFE_APDS9960::init()
  *
  * @return Contents of the ENABLE register. 0xFF if error.
  */
-uint8_t SFE_APDS9960::getMode()
+uint8_t SparkFun_APDS9960::getMode()
 {
     uint8_t enable_value;
     
@@ -222,7 +222,7 @@ uint8_t SFE_APDS9960::getMode()
  * @param[in] enable ON (1) or OFF (0)
  * @return True if operation success. False otherwise.
  */
-bool SFE_APDS9960::setMode(uint8_t mode, uint8_t enable)
+bool SparkFun_APDS9960::setMode(uint8_t mode, uint8_t enable)
 {
     uint8_t reg_val;
 
@@ -262,7 +262,7 @@ bool SFE_APDS9960::setMode(uint8_t mode, uint8_t enable)
  * @param[in] interrupts true to enable hardware interrupt on high or low light
  * @return True if sensor enabled correctly. False on error.
  */
-bool SFE_APDS9960::enableLightSensor(bool interrupts)
+bool SparkFun_APDS9960::enableLightSensor(bool interrupts)
 {
     
     /* Set default gain, interrupts, enable power, and enable sensor */
@@ -294,7 +294,7 @@ bool SFE_APDS9960::enableLightSensor(bool interrupts)
  *
  * @return True if sensor disabled correctly. False on error.
  */
-bool SFE_APDS9960::disableLightSensor()
+bool SparkFun_APDS9960::disableLightSensor()
 {
     if( !setAmbientLightIntEnable(0) ) {
         return false;
@@ -312,7 +312,7 @@ bool SFE_APDS9960::disableLightSensor()
  * @param[in] interrupts true to enable hardware external interrupt on proximity
  * @return True if sensor enabled correctly. False on error.
  */
-bool SFE_APDS9960::enableProximitySensor(bool interrupts)
+bool SparkFun_APDS9960::enableProximitySensor(bool interrupts)
 {
     /* Set default gain, LED, interrupts, enable power, and enable sensor */
     if( !setProximityGain(DEFAULT_PGAIN) ) {
@@ -347,7 +347,7 @@ bool SFE_APDS9960::enableProximitySensor(bool interrupts)
  * @param[in] interrupts true to enable hardware external interrupt on gesture
  * @return True if engine enabled correctly. False on error.
  */
-bool SFE_APDS9960::enableGestureSensor(bool interrupts)
+bool SparkFun_APDS9960::enableGestureSensor(bool interrupts)
 {
     
     /* Enable gesture mode
@@ -399,7 +399,7 @@ bool SFE_APDS9960::enableGestureSensor(bool interrupts)
  *
  * @return True if engine disabled correctly. False on error.
  */
-bool SFE_APDS9960::disableGestureSensor()
+bool SparkFun_APDS9960::disableGestureSensor()
 {
     resetGestureParameters();
     if( !setGestureIntEnable(0) ) {
@@ -420,7 +420,7 @@ bool SFE_APDS9960::disableGestureSensor()
  *
  * @return True if gesture available. False otherwise.
  */
-bool SFE_APDS9960::isGestureAvailable()
+bool SparkFun_APDS9960::isGestureAvailable()
 {
     uint8_t val;
     
@@ -445,7 +445,7 @@ bool SFE_APDS9960::isGestureAvailable()
  *
  * @return Number corresponding to gesture. -1 on error.
  */
-int SFE_APDS9960::readGesture()
+int SparkFun_APDS9960::readGesture()
 {
     uint8_t fifo_level = 0;
     uint8_t bytes_read = 0;
@@ -560,7 +560,7 @@ int SFE_APDS9960::readGesture()
  *
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::enablePower()
+bool SparkFun_APDS9960::enablePower()
 {
     if( !setMode(POWER, 1) ) {
         return false;
@@ -574,7 +574,7 @@ bool SFE_APDS9960::enablePower()
  *
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::disablePower()
+bool SparkFun_APDS9960::disablePower()
 {
     if( !setMode(POWER, 0) ) {
         return false;
@@ -593,7 +593,7 @@ bool SFE_APDS9960::disablePower()
  * @param[out] val value of the light sensor.
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::readAmbientLight(uint16_t &val)
+bool SparkFun_APDS9960::readAmbientLight(uint16_t &val)
 {
     uint8_t val_byte;
     val = 0;
@@ -619,7 +619,7 @@ bool SFE_APDS9960::readAmbientLight(uint16_t &val)
  * @param[out] val value of the light sensor.
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::readRedLight(uint16_t &val)
+bool SparkFun_APDS9960::readRedLight(uint16_t &val)
 {
     uint8_t val_byte;
     val = 0;
@@ -645,7 +645,7 @@ bool SFE_APDS9960::readRedLight(uint16_t &val)
  * @param[out] val value of the light sensor.
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::readGreenLight(uint16_t &val)
+bool SparkFun_APDS9960::readGreenLight(uint16_t &val)
 {
     uint8_t val_byte;
     val = 0;
@@ -671,7 +671,7 @@ bool SFE_APDS9960::readGreenLight(uint16_t &val)
  * @param[out] val value of the light sensor.
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::readBlueLight(uint16_t &val)
+bool SparkFun_APDS9960::readBlueLight(uint16_t &val)
 {
     uint8_t val_byte;
     val = 0;
@@ -701,7 +701,7 @@ bool SFE_APDS9960::readBlueLight(uint16_t &val)
  * @param[out] val value of the proximity sensor.
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::readProximity(uint8_t &val)
+bool SparkFun_APDS9960::readProximity(uint8_t &val)
 {
     val = 0;
     
@@ -720,7 +720,7 @@ bool SFE_APDS9960::readProximity(uint8_t &val)
 /**
  * @brief Resets all the parameters in the gesture data member
  */
-void SFE_APDS9960::resetGestureParameters()
+void SparkFun_APDS9960::resetGestureParameters()
 {
     gesture_data_.index = 0;
     gesture_data_.total_gestures = 0;
@@ -743,7 +743,7 @@ void SFE_APDS9960::resetGestureParameters()
  *
  * @return True if near or far state seen. False otherwise.
  */
-bool SFE_APDS9960::processGestureData()
+bool SparkFun_APDS9960::processGestureData()
 {
     uint8_t u_first = 0;
     uint8_t d_first = 0;
@@ -945,7 +945,7 @@ bool SFE_APDS9960::processGestureData()
  *
  * @return True if near/far event. False otherwise.
  */
-bool SFE_APDS9960::decodeGesture()
+bool SparkFun_APDS9960::decodeGesture()
 {
     /* Return if near or far event is detected */
     if( gesture_state_ == NEAR_STATE ) {
@@ -1005,7 +1005,7 @@ bool SFE_APDS9960::decodeGesture()
  *
  * @return lower threshold
  */
-uint8_t SFE_APDS9960::getProxIntLowThresh()
+uint8_t SparkFun_APDS9960::getProxIntLowThresh()
 {
     uint8_t val;
     
@@ -1023,7 +1023,7 @@ uint8_t SFE_APDS9960::getProxIntLowThresh()
  * @param[in] threshold the lower proximity threshold
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setProxIntLowThresh(uint8_t threshold)
+bool SparkFun_APDS9960::setProxIntLowThresh(uint8_t threshold)
 {
     if( !wireWriteDataByte(APDS9960_PILT, threshold) ) {
         return false;
@@ -1037,7 +1037,7 @@ bool SFE_APDS9960::setProxIntLowThresh(uint8_t threshold)
  *
  * @return high threshold
  */
-uint8_t SFE_APDS9960::getProxIntHighThresh()
+uint8_t SparkFun_APDS9960::getProxIntHighThresh()
 {
     uint8_t val;
     
@@ -1055,7 +1055,7 @@ uint8_t SFE_APDS9960::getProxIntHighThresh()
  * @param[in] threshold the high proximity threshold
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setProxIntHighThresh(uint8_t threshold)
+bool SparkFun_APDS9960::setProxIntHighThresh(uint8_t threshold)
 {
     if( !wireWriteDataByte(APDS9960_PIHT, threshold) ) {
         return false;
@@ -1075,7 +1075,7 @@ bool SFE_APDS9960::setProxIntHighThresh(uint8_t threshold)
  *
  * @return the value of the LED drive strength. 0xFF on failure.
  */
-uint8_t SFE_APDS9960::getLEDDrive()
+uint8_t SparkFun_APDS9960::getLEDDrive()
 {
     uint8_t val;
     
@@ -1102,7 +1102,7 @@ uint8_t SFE_APDS9960::getLEDDrive()
  * @param[in] drive the value (0-3) for the LED drive strength
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setLEDDrive(uint8_t drive)
+bool SparkFun_APDS9960::setLEDDrive(uint8_t drive)
 {
     uint8_t val;
     
@@ -1136,7 +1136,7 @@ bool SFE_APDS9960::setLEDDrive(uint8_t drive)
  *
  * @return the value of the proximity gain. 0xFF on failure.
  */
-uint8_t SFE_APDS9960::getProximityGain()
+uint8_t SparkFun_APDS9960::getProximityGain()
 {
     uint8_t val;
     
@@ -1163,7 +1163,7 @@ uint8_t SFE_APDS9960::getProximityGain()
  * @param[in] drive the value (0-3) for the gain
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setProximityGain(uint8_t drive)
+bool SparkFun_APDS9960::setProximityGain(uint8_t drive)
 {
     uint8_t val;
     
@@ -1197,7 +1197,7 @@ bool SFE_APDS9960::setProximityGain(uint8_t drive)
  *
  * @return the value of the ALS gain. 0xFF on failure.
  */
-uint8_t SFE_APDS9960::getAmbientLightGain()
+uint8_t SparkFun_APDS9960::getAmbientLightGain()
 {
     uint8_t val;
     
@@ -1224,7 +1224,7 @@ uint8_t SFE_APDS9960::getAmbientLightGain()
  * @param[in] drive the value (0-3) for the gain
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setAmbientLightGain(uint8_t drive)
+bool SparkFun_APDS9960::setAmbientLightGain(uint8_t drive)
 {
     uint8_t val;
     
@@ -1257,7 +1257,7 @@ bool SFE_APDS9960::setAmbientLightGain(uint8_t drive)
  *
  * @return The LED boost value. 0xFF on failure.
  */
-uint8_t SFE_APDS9960::getLEDBoost()
+uint8_t SparkFun_APDS9960::getLEDBoost()
 {
     uint8_t val;
     
@@ -1284,7 +1284,7 @@ uint8_t SFE_APDS9960::getLEDBoost()
  * @param[in] drive the value (0-3) for current boost (100-300%)
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setLEDBoost(uint8_t boost)
+bool SparkFun_APDS9960::setLEDBoost(uint8_t boost)
 {
     uint8_t val;
     
@@ -1312,7 +1312,7 @@ bool SFE_APDS9960::setLEDBoost(uint8_t boost)
  *
  * @return 1 if compensation is enabled. 0 if not. 0xFF on error.
  */
-uint8_t SFE_APDS9960::getProxGainCompEnable()
+uint8_t SparkFun_APDS9960::getProxGainCompEnable()
 {
     uint8_t val;
     
@@ -1333,7 +1333,7 @@ uint8_t SFE_APDS9960::getProxGainCompEnable()
  * @param[in] enable 1 to enable compensation. 0 to disable compensation.
  * @return True if operation successful. False otherwise.
  */
- bool SFE_APDS9960::setProxGainCompEnable(uint8_t enable)
+ bool SparkFun_APDS9960::setProxGainCompEnable(uint8_t enable)
 {
     uint8_t val;
     
@@ -1368,7 +1368,7 @@ uint8_t SFE_APDS9960::getProxGainCompEnable()
  *
  * @return Current proximity mask for photodiodes. 0xFF on error.
  */
-uint8_t SFE_APDS9960::getProxPhotoMask()
+uint8_t SparkFun_APDS9960::getProxPhotoMask()
 {
     uint8_t val;
     
@@ -1396,7 +1396,7 @@ uint8_t SFE_APDS9960::getProxPhotoMask()
  * @param[in] mask 4-bit mask value
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setProxPhotoMask(uint8_t mask)
+bool SparkFun_APDS9960::setProxPhotoMask(uint8_t mask)
 {
     uint8_t val;
     
@@ -1423,7 +1423,7 @@ bool SFE_APDS9960::setProxPhotoMask(uint8_t mask)
  *
  * @return Current entry proximity threshold.
  */
-uint8_t SFE_APDS9960::getGestureEnterThresh()
+uint8_t SparkFun_APDS9960::getGestureEnterThresh()
 {
     uint8_t val;
     
@@ -1441,7 +1441,7 @@ uint8_t SFE_APDS9960::getGestureEnterThresh()
  * @param[in] threshold proximity value needed to start gesture mode
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setGestureEnterThresh(uint8_t threshold)
+bool SparkFun_APDS9960::setGestureEnterThresh(uint8_t threshold)
 {
     if( !wireWriteDataByte(APDS9960_GPENTH, threshold) ) {
         return false;
@@ -1455,7 +1455,7 @@ bool SFE_APDS9960::setGestureEnterThresh(uint8_t threshold)
  *
  * @return Current exit proximity threshold.
  */
-uint8_t SFE_APDS9960::getGestureExitThresh()
+uint8_t SparkFun_APDS9960::getGestureExitThresh()
 {
     uint8_t val;
     
@@ -1473,7 +1473,7 @@ uint8_t SFE_APDS9960::getGestureExitThresh()
  * @param[in] threshold proximity value needed to end gesture mode
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setGestureExitThresh(uint8_t threshold)
+bool SparkFun_APDS9960::setGestureExitThresh(uint8_t threshold)
 {
     if( !wireWriteDataByte(APDS9960_GEXTH, threshold) ) {
         return false;
@@ -1493,7 +1493,7 @@ bool SFE_APDS9960::setGestureExitThresh(uint8_t threshold)
  *
  * @return the current photodiode gain. 0xFF on error.
  */
-uint8_t SFE_APDS9960::getGestureGain()
+uint8_t SparkFun_APDS9960::getGestureGain()
 {
     uint8_t val;
     
@@ -1520,7 +1520,7 @@ uint8_t SFE_APDS9960::getGestureGain()
  * @param[in] gain the value for the photodiode gain
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setGestureGain(uint8_t gain)
+bool SparkFun_APDS9960::setGestureGain(uint8_t gain)
 {
     uint8_t val;
     
@@ -1554,7 +1554,7 @@ bool SFE_APDS9960::setGestureGain(uint8_t gain)
  *
  * @return the LED drive current value. 0xFF on error.
  */
-uint8_t SFE_APDS9960::getGestureLEDDrive()
+uint8_t SparkFun_APDS9960::getGestureLEDDrive()
 {
     uint8_t val;
     
@@ -1581,7 +1581,7 @@ uint8_t SFE_APDS9960::getGestureLEDDrive()
  * @param[in] drive the value for the LED drive current
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setGestureLEDDrive(uint8_t drive)
+bool SparkFun_APDS9960::setGestureLEDDrive(uint8_t drive)
 {
     uint8_t val;
     
@@ -1619,7 +1619,7 @@ bool SFE_APDS9960::setGestureLEDDrive(uint8_t drive)
  *
  * @return the current wait time between gestures. 0xFF on error.
  */
-uint8_t SFE_APDS9960::getGestureWaitTime()
+uint8_t SparkFun_APDS9960::getGestureWaitTime()
 {
     uint8_t val;
     
@@ -1650,7 +1650,7 @@ uint8_t SFE_APDS9960::getGestureWaitTime()
  * @param[in] the value for the wait time
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setGestureWaitTime(uint8_t time)
+bool SparkFun_APDS9960::setGestureWaitTime(uint8_t time)
 {
     uint8_t val;
     
@@ -1678,7 +1678,7 @@ bool SFE_APDS9960::setGestureWaitTime(uint8_t time)
  * @param[out] threshold current low threshold stored on the APDS-9960
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::getLightIntLowThreshold(uint16_t &threshold)
+bool SparkFun_APDS9960::getLightIntLowThreshold(uint16_t &threshold)
 {
     uint8_t val_byte;
     threshold = 0;
@@ -1704,7 +1704,7 @@ bool SFE_APDS9960::getLightIntLowThreshold(uint16_t &threshold)
  * @param[in] threshold low threshold value for interrupt to trigger
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setLightIntLowThreshold(uint16_t threshold)
+bool SparkFun_APDS9960::setLightIntLowThreshold(uint16_t threshold)
 {
     uint8_t val_low;
     uint8_t val_high;
@@ -1732,7 +1732,7 @@ bool SFE_APDS9960::setLightIntLowThreshold(uint16_t threshold)
  * @param[out] threshold current low threshold stored on the APDS-9960
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::getLightIntHighThreshold(uint16_t &threshold)
+bool SparkFun_APDS9960::getLightIntHighThreshold(uint16_t &threshold)
 {
     uint8_t val_byte;
     threshold = 0;
@@ -1758,7 +1758,7 @@ bool SFE_APDS9960::getLightIntHighThreshold(uint16_t &threshold)
  * @param[in] threshold high threshold value for interrupt to trigger
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setLightIntHighThreshold(uint16_t threshold)
+bool SparkFun_APDS9960::setLightIntHighThreshold(uint16_t threshold)
 {
     uint8_t val_low;
     uint8_t val_high;
@@ -1786,7 +1786,7 @@ bool SFE_APDS9960::setLightIntHighThreshold(uint16_t threshold)
  * @param[out] threshold current low threshold stored on the APDS-9960
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::getProximityIntLowThreshold(uint8_t &threshold)
+bool SparkFun_APDS9960::getProximityIntLowThreshold(uint8_t &threshold)
 {
     threshold = 0;
     
@@ -1804,7 +1804,7 @@ bool SFE_APDS9960::getProximityIntLowThreshold(uint8_t &threshold)
  * @param[in] threshold low threshold value for interrupt to trigger
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setProximityIntLowThreshold(uint8_t threshold)
+bool SparkFun_APDS9960::setProximityIntLowThreshold(uint8_t threshold)
 {
     
     /* Write threshold value to register */
@@ -1821,7 +1821,7 @@ bool SFE_APDS9960::setProximityIntLowThreshold(uint8_t threshold)
  * @param[out] threshold current low threshold stored on the APDS-9960
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::getProximityIntHighThreshold(uint8_t &threshold)
+bool SparkFun_APDS9960::getProximityIntHighThreshold(uint8_t &threshold)
 {
     threshold = 0;
     
@@ -1839,7 +1839,7 @@ bool SFE_APDS9960::getProximityIntHighThreshold(uint8_t &threshold)
  * @param[in] threshold high threshold value for interrupt to trigger
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setProximityIntHighThreshold(uint8_t threshold)
+bool SparkFun_APDS9960::setProximityIntHighThreshold(uint8_t threshold)
 {
     
     /* Write threshold value to register */
@@ -1855,7 +1855,7 @@ bool SFE_APDS9960::setProximityIntHighThreshold(uint8_t threshold)
  *
  * @return 1 if interrupts are enabled, 0 if not. 0xFF on error.
  */
-uint8_t SFE_APDS9960::getAmbientLightIntEnable()
+uint8_t SparkFun_APDS9960::getAmbientLightIntEnable()
 {
     uint8_t val;
     
@@ -1876,7 +1876,7 @@ uint8_t SFE_APDS9960::getAmbientLightIntEnable()
  * @param[in] enable 1 to enable interrupts, 0 to turn them off
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setAmbientLightIntEnable(uint8_t enable)
+bool SparkFun_APDS9960::setAmbientLightIntEnable(uint8_t enable)
 {
     uint8_t val;
     
@@ -1904,7 +1904,7 @@ bool SFE_APDS9960::setAmbientLightIntEnable(uint8_t enable)
  *
  * @return 1 if interrupts are enabled, 0 if not. 0xFF on error.
  */
-uint8_t SFE_APDS9960::getProximityIntEnable()
+uint8_t SparkFun_APDS9960::getProximityIntEnable()
 {
     uint8_t val;
     
@@ -1925,7 +1925,7 @@ uint8_t SFE_APDS9960::getProximityIntEnable()
  * @param[in] enable 1 to enable interrupts, 0 to turn them off
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setProximityIntEnable(uint8_t enable)
+bool SparkFun_APDS9960::setProximityIntEnable(uint8_t enable)
 {
     uint8_t val;
     
@@ -1953,7 +1953,7 @@ bool SFE_APDS9960::setProximityIntEnable(uint8_t enable)
  *
  * @return 1 if interrupts are enabled, 0 if not. 0xFF on error.
  */
-uint8_t SFE_APDS9960::getGestureIntEnable()
+uint8_t SparkFun_APDS9960::getGestureIntEnable()
 {
     uint8_t val;
     
@@ -1974,7 +1974,7 @@ uint8_t SFE_APDS9960::getGestureIntEnable()
  * @param[in] enable 1 to enable interrupts, 0 to turn them off
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setGestureIntEnable(uint8_t enable)
+bool SparkFun_APDS9960::setGestureIntEnable(uint8_t enable)
 {
     uint8_t val;
     
@@ -2002,7 +2002,7 @@ bool SFE_APDS9960::setGestureIntEnable(uint8_t enable)
  *
  * @return True if operation completed successfully. False otherwise.
  */
-bool SFE_APDS9960::clearAmbientLightInt()
+bool SparkFun_APDS9960::clearAmbientLightInt()
 {
     uint8_t throwaway;
     if( !wireReadDataByte(APDS9960_AICLEAR, throwaway) ) {
@@ -2017,7 +2017,7 @@ bool SFE_APDS9960::clearAmbientLightInt()
  *
  * @return True if operation completed successfully. False otherwise.
  */
-bool SFE_APDS9960::clearProximityInt()
+bool SparkFun_APDS9960::clearProximityInt()
 {
     uint8_t throwaway;
     if( !wireReadDataByte(APDS9960_PICLEAR, throwaway) ) {
@@ -2032,7 +2032,7 @@ bool SFE_APDS9960::clearProximityInt()
  *
  * @return 1 if gesture state machine is running, 0 if not. 0xFF on error.
  */
-uint8_t SFE_APDS9960::getGestureMode()
+uint8_t SparkFun_APDS9960::getGestureMode()
 {
     uint8_t val;
     
@@ -2053,7 +2053,7 @@ uint8_t SFE_APDS9960::getGestureMode()
  * @param[in] mode 1 to enter gesture state machine, 0 to exit.
  * @return True if operation successful. False otherwise.
  */
-bool SFE_APDS9960::setGestureMode(uint8_t mode)
+bool SparkFun_APDS9960::setGestureMode(uint8_t mode)
 {
     uint8_t val;
     
@@ -2085,7 +2085,7 @@ bool SFE_APDS9960::setGestureMode(uint8_t mode)
  * @param[in] val the 1-byte value to write to the I2C device
  * @return True if successful write operation. False otherwise.
  */
-bool SFE_APDS9960::wireWriteByte(uint8_t val)
+bool SparkFun_APDS9960::wireWriteByte(uint8_t val)
 {
     Wire.beginTransmission(APDS9960_I2C_ADDR);
     Wire.write(val);
@@ -2103,7 +2103,7 @@ bool SFE_APDS9960::wireWriteByte(uint8_t val)
  * @param[in] val the 1-byte value to write to the I2C device
  * @return True if successful write operation. False otherwise.
  */
-bool SFE_APDS9960::wireWriteDataByte(uint8_t reg, uint8_t val)
+bool SparkFun_APDS9960::wireWriteDataByte(uint8_t reg, uint8_t val)
 {
     Wire.beginTransmission(APDS9960_I2C_ADDR);
     Wire.write(reg);
@@ -2123,7 +2123,7 @@ bool SFE_APDS9960::wireWriteDataByte(uint8_t reg, uint8_t val)
  * @param[in] len the length (in bytes) of the data to write
  * @return True if successful write operation. False otherwise.
  */
-bool SFE_APDS9960::wireWriteDataBlock(  uint8_t reg, 
+bool SparkFun_APDS9960::wireWriteDataBlock(  uint8_t reg, 
                                         uint8_t *val, 
                                         unsigned int len)
 {
@@ -2148,7 +2148,7 @@ bool SFE_APDS9960::wireWriteDataBlock(  uint8_t reg,
  * @param[out] the value returned from the register
  * @return True if successful read operation. False otherwise.
  */
-bool SFE_APDS9960::wireReadDataByte(uint8_t reg, uint8_t &val)
+bool SparkFun_APDS9960::wireReadDataByte(uint8_t reg, uint8_t &val)
 {
     
     /* Indicate which register we want to read from */
@@ -2173,7 +2173,7 @@ bool SFE_APDS9960::wireReadDataByte(uint8_t reg, uint8_t &val)
  * @param[in] len number of bytes to read
  * @return Number of bytes read. -1 on read error.
  */
-int SFE_APDS9960::wireReadDataBlock(   uint8_t reg, 
+int SparkFun_APDS9960::wireReadDataBlock(   uint8_t reg, 
                                         uint8_t *val, 
                                         unsigned int len)
 {

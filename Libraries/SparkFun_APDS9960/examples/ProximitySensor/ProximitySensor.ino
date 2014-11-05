@@ -21,7 +21,7 @@ IMPORTANT: The APDS-9960 can only accept 3.3V!
  A5           SCL              I2C Clock
 
 Resources:
-Include Wire.h and SFE_APDS-9960.h
+Include Wire.h and SparkFun_APDS-9960.h
 
 Development environment specifics:
 Written in Arduino 1.0.5
@@ -35,10 +35,10 @@ Distributed as-is; no warranty is given.
 ****************************************************************/
 
 #include <Wire.h>
-#include <SFE_APDS9960.h>
+#include <SparkFun_APDS9960.h>
 
 // Global Variables
-SFE_APDS9960 apds = SFE_APDS9960();
+SparkFun_APDS9960 apds = SparkFun_APDS9960();
 uint8_t proximity_data = 0;
 
 void setup() {

@@ -1,1 +1,1 @@
-The SFE_APDS9960 folder contains a library and example sketches for Arduino.
+The SparkFun_APDS9960 folder contains a library and example sketches for Arduino.

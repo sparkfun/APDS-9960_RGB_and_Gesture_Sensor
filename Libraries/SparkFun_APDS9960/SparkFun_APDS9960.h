@@ -1,5 +1,5 @@
 /**
- * @file    SFE_APDS-9960.h
+ * @file    SparkFun_APDS-9960.h
  * @brief   Library for the SparkFun APDS-9960 breakout board
  * @author  Shawn Hymel (SparkFun Electronics)
  *
@@ -11,8 +11,8 @@
  * APDS9960 object, call init(), and call the appropriate functions.
  */
  
-#ifndef SFE_APDS9960_H
-#define SFE_APDS9960_H
+#ifndef SparkFun_APDS9960_H
+#define SparkFun_APDS9960_H
 
 #include <Arduino.h>
 
@@ -214,12 +214,12 @@ typedef struct gesture_data_type {
 } gesture_data_type;
 
 /* APDS9960 Class */
-class SFE_APDS9960 {
+class SparkFun_APDS9960 {
 public:
 
     /* Initialization methods */
-    SFE_APDS9960();
-    ~SFE_APDS9960();
+    SparkFun_APDS9960();
+    ~SparkFun_APDS9960();
     bool init();
     uint8_t getMode();
     bool setMode(uint8_t mode, uint8_t enable);
