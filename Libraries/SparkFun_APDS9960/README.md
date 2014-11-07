@@ -11,6 +11,8 @@ Version
 Known Issues
 ------------
 
+* The program can freeze if you swipe your hand back and forth too quickly over the sensor during gesture mode
+
 Getting Started
 ---------------
 
