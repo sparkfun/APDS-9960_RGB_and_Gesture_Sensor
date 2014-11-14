@@ -86,8 +86,10 @@ void setup() {
 
 void loop() {
   if( isr_flag == 1 ) {
+    detachInterrupt(0);
     handleGesture();
     isr_flag = 0;
+    attachInterrupt(0, interruptRoutine, FALLING);
   }
 }
 

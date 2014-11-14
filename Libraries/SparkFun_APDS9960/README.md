@@ -6,12 +6,10 @@ Arduino library for the [Avago APDS-9960 Breakout Board](https://www.sparkfun.co
 Version
 -------
 
-**v1.0**
+**v1.1**
 
 Known Issues
 ------------
-
-* The program can freeze if you swipe your hand back and forth too quickly over the sensor during gesture mode
 
 Getting Started
 ---------------
@@ -40,6 +38,10 @@ Getting Started
 
 Version History
 ---------------
+
+**v1.1**
+
+* Updated GestureTest demo to not freeze with fast swipes
 
 **v1.0**
 
