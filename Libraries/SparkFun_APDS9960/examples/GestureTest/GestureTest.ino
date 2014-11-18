@@ -59,6 +59,9 @@ int isr_flag = 0;
 
 void setup() {
 
+  // Set interrupt pin as input
+  pinMode(APDS9960_INT, INPUT);
+
   // Initialize Serial port
   Serial.begin(9600);
   Serial.println();

@@ -6,7 +6,7 @@ Arduino library for the [Avago APDS-9960 Breakout Board](https://www.sparkfun.co
 Version
 -------
 
-**v1.1**
+**v1.2**
 
 Known Issues
 ------------
@@ -38,6 +38,10 @@ Getting Started
 
 Version History
 ---------------
+
+**v1.2**
+
+* Added pinMode line to GestureTest demo to fix interrupt bug with some Arduinos
 
 **v1.1**
 
