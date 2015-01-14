@@ -339,7 +339,23 @@ bool SparkFun_APDS9960::enableProximitySensor(bool interrupts)
     
     return true;
 }
-    bool disableProximitySensor();
+
+/**
+ * @brief Ends the proximity sensor on the APDS-9960
+ *
+ * @return True if sensor disabled correctly. False on error.
+ */
+bool SparkFun_APDS9960::disableProximitySensor()
+{
+	if( !setProximityIntEnable(0) ) {
+		return false;
+	}
+	if( !setMode(PROXIMITY, 0) ) {
+		return false;
+	}
+
+	return true;
+}
 
 /**
  * @brief Starts the gesture recognition engine on the APDS-9960

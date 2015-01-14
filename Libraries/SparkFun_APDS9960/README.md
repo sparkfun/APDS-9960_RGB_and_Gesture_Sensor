@@ -6,7 +6,7 @@ Arduino library for the [Avago APDS-9960 Breakout Board](https://www.sparkfun.co
 Version
 -------
 
-**v1.2**
+**v1.3**
 
 Known Issues
 ------------
@@ -38,6 +38,10 @@ Getting Started
 
 Version History
 ---------------
+
+**v1.3**
+
+* Implemented disableProximitySensor(). Thanks to jmg5150 for catching that!
 
 **v1.2**
 
