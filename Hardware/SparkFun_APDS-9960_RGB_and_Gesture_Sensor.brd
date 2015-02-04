@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.5.0">
+<eagle version="7.2.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="yes"/>
@@ -1523,21 +1523,6 @@ We've spent an enormous amount of time creating and checking these footprints an
 &lt;br&gt;&lt;br&gt;
 You are welcome to use this library for commercial purposes. For attribution, we ask that when you begin to sell your device using our footprint, you email us with a link to the product being sold. We want bragging rights that we helped (in a very small part) to create your 8th world wonder. We would like the opportunity to feature your device on our homepage.</description>
 <packages>
-<package name="0603">
-<wire x1="-1.473" y1="0.983" x2="1.473" y2="0.983" width="0.0508" layer="39"/>
-<wire x1="1.473" y1="0.983" x2="1.473" y2="-0.983" width="0.0508" layer="39"/>
-<wire x1="1.473" y1="-0.983" x2="-1.473" y2="-0.983" width="0.0508" layer="39"/>
-<wire x1="-1.473" y1="-0.983" x2="-1.473" y2="0.983" width="0.0508" layer="39"/>
-<wire x1="-0.356" y1="0.432" x2="0.356" y2="0.432" width="0.1016" layer="51"/>
-<wire x1="-0.356" y1="-0.419" x2="0.356" y2="-0.419" width="0.1016" layer="51"/>
-<smd name="1" x="-0.85" y="0" dx="1.1" dy="1" layer="1"/>
-<smd name="2" x="0.85" y="0" dx="1.1" dy="1" layer="1"/>
-<text x="-0.889" y="0.762" size="0.4064" layer="25" font="vector">&gt;NAME</text>
-<text x="-1.016" y="-1.143" size="0.4064" layer="27" font="vector">&gt;VALUE</text>
-<rectangle x1="-0.8382" y1="-0.4699" x2="-0.3381" y2="0.4801" layer="51"/>
-<rectangle x1="0.3302" y1="-0.4699" x2="0.8303" y2="0.4801" layer="51"/>
-<rectangle x1="-0.1999" y1="-0.3" x2="0.1999" y2="0.3" layer="35"/>
-</package>
 <package name="0603-RES">
 <wire x1="-1.473" y1="0.983" x2="1.473" y2="0.983" width="0.0508" layer="39"/>
 <wire x1="1.473" y1="0.983" x2="1.473" y2="-0.983" width="0.0508" layer="39"/>
@@ -1765,6 +1750,9 @@ design rules under a new name.</description>
 <autorouter>
 <pass name="Default">
 <param name="RoutingGrid" value="50mil"/>
+<param name="AutoGrid" value="1"/>
+<param name="Efforts" value="0"/>
+<param name="TopRouterVariant" value="1"/>
 <param name="tpViaShape" value="round"/>
 <param name="PrefDir.1" value="|"/>
 <param name="PrefDir.2" value="0"/>
@@ -1865,8 +1853,9 @@ design rules under a new name.</description>
 <attribute name="PROD_ID" value="RES-00824" x="26.67" y="-10.795" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" value="10K" x="11.43" y="13.335" size="1.778" layer="27" display="off"/>
 </element>
-<element name="R2" library="SparkFun-Resistors" package="0603" value="4.7k" x="8.89" y="10.795" rot="R270">
+<element name="R2" library="SparkFun-Resistors" package="0603-RES" value="4.7K" x="8.89" y="10.795" rot="R270">
 <attribute name="PROD_ID" value="RES-07857" x="-15.24" y="-8.255" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="VALUE" value="4.7K" x="8.89" y="10.795" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="SJ1" library="SparkFun-Passives" package="SJ_3_PASTE1&amp;2&amp;3" value="" x="13.97" y="10.795" rot="R270"/>
 <element name="C2" library="SparkFun-Capacitors" package="0603-CAP" value="1.0uF" x="6.35" y="10.795" rot="R270">
@@ -1883,8 +1872,9 @@ design rules under a new name.</description>
 <element name="LOGO1" library="SparkFun-Aesthetics" package="SFE_LOGO_FLAME_.1" value="SFE_LOGO_FLAME.1_INCH" x="0.254" y="4.572"/>
 <element name="LOGO2" library="SparkFun-Aesthetics" package="OSHW-LOGO-S" value="OSHW-LOGOS" x="7.62" y="17.78" rot="MR0"/>
 <element name="R4" library="SparkFun-Resistors" package="0603-RES" value="DNP" x="3.81" y="10.795" rot="R90"/>
-<element name="R3" library="SparkFun-Resistors" package="0603" value="4.7k" x="11.43" y="10.795" rot="R90">
+<element name="R3" library="SparkFun-Resistors" package="0603-RES" value="4.7K" x="11.43" y="10.795" rot="R90">
 <attribute name="PROD_ID" value="RES-07857" x="11.43" y="10.795" size="1.778" layer="27" font="vector" ratio="15" rot="R90" display="off"/>
+<attribute name="VALUE" value="4.7K" x="11.43" y="10.795" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="SJ2" library="SparkFun-Retired" package="SJ_2S" value="SOLDERJUMPERNC" x="1.27" y="10.795" rot="R90"/>
 <element name="C1" library="SparkFun-Capacitors" package="EIA7343" value="100uF" x="7.62" y="6.35" rot="R180">
