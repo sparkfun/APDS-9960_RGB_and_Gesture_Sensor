@@ -1,5 +1,5 @@
-SparkFun_APDS9960 RGB and Gesture Sensor Libraries
-=================================
+SparkFun APDS9960 RGB and Gesture Sensor Libraries
+===================================================
 
 Libraries for use in different environments. 
 
@@ -16,12 +16,12 @@ Please use, reuse, and modify these files as you see fit. Please maintain attrib
 
 Distributed as-is; no warranty is given.
 
-\- Your friends at SparkFun.
+- Your friends at SparkFun.
 
 
 
-BUILD INSTRUCTIONS: 
+Update Library Instructions:
+----------------------------
+To get the most up-to-date version of the library, you must run the following git subtree commands. 
 
-$git subtree add -P <DIRECTORY NAME> --squash <git repo URL> <ref>
-
-$git subtree pull -P <DIRECTORY NAME> --squash <git repo URL> <ref>
+$git subtree pull -P Libraries/Arduino --squashhttps://github.com/sparkfun/SparkFun_APDS-9960_Sensor_Arduino_Library.git master
