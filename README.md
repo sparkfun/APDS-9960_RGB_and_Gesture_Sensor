@@ -28,6 +28,7 @@ Product Versions
 
 Version History
 ---------------
+* [V_H1.0_L1.4.2](https://github.com/sparkfun/APDS-9960_RGB_and_Gesture_Sensor/tree/V_H1.0_L1.4.2) - Fixing library name compiliation error. 
 * [V_H1.0_L1.4.1](https://github.com/sparkfun/APDS-9960_RGB_and_Gesture_Sensor/tree/V_H1.0_L1.4.1) - Fixing minor typos in both library and hardware files.
 * [V_1.1.1](https://github.com/sparkfun/APDS-9960_RGB_and_Gesture_Sensor/tree/V_1.1.1) - Updated to new tag syntax
 * [V11](https://github.com/sparkfun/APDS-9960_RGB_and_Gesture_Sensor/tree/v11) - Updated to new library structure
