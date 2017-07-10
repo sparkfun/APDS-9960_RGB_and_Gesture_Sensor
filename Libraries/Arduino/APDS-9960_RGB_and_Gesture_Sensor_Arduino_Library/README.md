@@ -10,8 +10,7 @@ Getting Started
 
 * Download the Git repository as a ZIP ("Download ZIP" button)
 * Unzip
-* Copy the entire library directory (APDS-9960_RGB_and_Gesture_Sensor_Arduino_Library
-) to \<Arduino installation directory\>/libraries
+* Copy the entire library directory (Libraries/Arduino/APDS-9960_RGB_and_Gesture_Sensor_Arduino_Library) to \<Arduino installation directory\>/libraries
 * Open the Arduino program
 * Select File -> Examples -> SparkFun_APDS9960 -> GestureTest
 * Plug in your Arduino and APDS-9960 with the following connections
