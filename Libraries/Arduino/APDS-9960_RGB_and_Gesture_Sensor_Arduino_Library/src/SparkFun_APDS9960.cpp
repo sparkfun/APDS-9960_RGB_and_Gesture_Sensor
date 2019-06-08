@@ -63,7 +63,7 @@ bool SparkFun_APDS9960::init()
     if( !wireReadDataByte(APDS9960_ID, id) ) {
         return false;
     }
-    if( !(id == APDS9960_ID_1 || id == APDS9960_ID_2) ) {
+    if( !(id == APDS9960_ID_1 || id == APDS9960_ID_2 || id == APDS9960_ID_3) ) {
         return false;
     }
      
