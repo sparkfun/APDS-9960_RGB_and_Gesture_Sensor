@@ -234,7 +234,7 @@ bool SparkFun_APDS9960::setMode(uint8_t mode, uint8_t enable)
 
     /* Change bit(s) in ENABLE register */
     enable = enable & 0x01;
-    if( mode >= 0 && mode <= 6 ) {
+    if(mode <= 6 ) {
         if (enable) {
             reg_val |= (1 << mode);
         } else {
@@ -761,14 +761,14 @@ void SparkFun_APDS9960::resetGestureParameters()
  */
 bool SparkFun_APDS9960::processGestureData()
 {
-    uint8_t u_first = 0;
-    uint8_t d_first = 0;
-    uint8_t l_first = 0;
-    uint8_t r_first = 0;
-    uint8_t u_last = 0;
-    uint8_t d_last = 0;
-    uint8_t l_last = 0;
-    uint8_t r_last = 0;
+    uint8_t u_first = 1;
+    uint8_t d_first = 1;
+    uint8_t l_first = 1;
+    uint8_t r_first = 1;
+    uint8_t u_last = 1;
+    uint8_t d_last = 1;
+    uint8_t l_last = 1;
+    uint8_t r_last = 1;
     int ud_ratio_first;
     int lr_ratio_first;
     int ud_ratio_last;
@@ -789,7 +789,7 @@ bool SparkFun_APDS9960::processGestureData()
         /* Find the first value in U/D/L/R above the threshold */
         for( i = 0; i < gesture_data_.total_gestures; i++ ) {
             if( (gesture_data_.u_data[i] > GESTURE_THRESHOLD_OUT) &&
-                (gesture_data_.d_data[i] > GESTURE_THRESHOLD_OUT) &&
+                (gesture_data_.d_data[i] > GESTURE_THRESHOLD_OUT) ||
                 (gesture_data_.l_data[i] > GESTURE_THRESHOLD_OUT) &&
                 (gesture_data_.r_data[i] > GESTURE_THRESHOLD_OUT) ) {
 
@@ -801,12 +801,6 @@ bool SparkFun_APDS9960::processGestureData()
             }
         }
 
-        /* If one of the _first values is 0, then there is no good data */
-        if( (u_first == 0) || (d_first == 0) || \
-            (l_first == 0) || (r_first == 0) ) {
-
-            return false;
-        }
         /* Find the last value in U/D/L/R above the threshold */
         for( i = gesture_data_.total_gestures - 1; i >= 0; i-- ) {
 #if DEBUG
@@ -821,7 +815,7 @@ bool SparkFun_APDS9960::processGestureData()
             Serial.println(gesture_data_.r_data[i]);
 #endif
             if( (gesture_data_.u_data[i] > GESTURE_THRESHOLD_OUT) &&
-                (gesture_data_.d_data[i] > GESTURE_THRESHOLD_OUT) &&
+                (gesture_data_.d_data[i] > GESTURE_THRESHOLD_OUT) ||
                 (gesture_data_.l_data[i] > GESTURE_THRESHOLD_OUT) &&
                 (gesture_data_.r_data[i] > GESTURE_THRESHOLD_OUT) ) {
 
@@ -2148,7 +2142,7 @@ bool SparkFun_APDS9960::wireWriteDataBlock(  uint8_t reg,
     Wire.beginTransmission(APDS9960_I2C_ADDR);
     Wire.write(reg);
     for(i = 0; i < len; i++) {
-        Wire.beginTransmission(val[i]);
+        Wire.write(val[i]);
     }
     if( Wire.endTransmission() != 0 ) {
         return false;
