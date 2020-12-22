@@ -1,0 +1,15 @@
+(module STAND-OFF (layer F.Cu) (tedit 5FDDA6DF)
+  (descr "<b>Stand Off</b><p>\nThis is the mechanical footprint for a #4 phillips button head screw. Use the keepout ring to avoid running the screw head into surrounding components. SKU : PRT-00447")
+  (fp_text reference STANDOFF1 (at 0 0) (layer F.SilkS) hide
+    (effects (font (size 1.27 1.27) (thickness 0.15)))
+  )
+  (fp_text value STAND-OFF (at 0 0) (layer F.SilkS) hide
+    (effects (font (size 1.27 1.27) (thickness 0.15)))
+  )
+  (fp_circle (center 0 0) (end 2.6 0) (layer Dwgs.User) (width 0.05))
+  (fp_circle (center 0 0) (end 2.7 0) (layer F.CrtYd) (width 0.05))
+  (fp_circle (center 0 0) (end 1.702939 0) (layer F.Fab) (width 0.05))
+  (fp_circle (center 0 0) (end 1.612452 0) (layer Dwgs.User) (width 0.05))
+  (pad "" np_thru_hole circle (at 0 0) (size 3.302 3.302) (drill 3.302) (layers *.Cu *.Mask)
+    (clearance 1.016))
+)

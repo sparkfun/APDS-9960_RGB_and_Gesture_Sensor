@@ -1,0 +1,17 @@
+(module CREATIVE_COMMONS (layer F.Cu) (tedit 0)
+  (fp_text reference FRAME1 (at 0 0) (layer F.SilkS) hide
+    (effects (font (size 1.27 1.27) (thickness 0.15)))
+  )
+  (fp_text value FRAME-LETTER (at 0 0) (layer F.SilkS) hide
+    (effects (font (size 1.27 1.27) (thickness 0.15)))
+  )
+  (fp_text user "Released under the Creative Commons Attribution Share-Alike 4.0 License" (at -20.32 -5.08) (layer F.Fab)
+    (effects (font (size 1.6891 1.6891) (thickness 0.14224)) (justify left bottom))
+  )
+  (fp_text user " https://creativecommons.org/licenses/by-sa/4.0/" (at 0 -2.54) (layer F.Fab)
+    (effects (font (size 1.6891 1.6891) (thickness 0.14224)) (justify left bottom))
+  )
+  (fp_text user "Designed by:" (at 11.43 0) (layer F.Fab)
+    (effects (font (size 1.6891 1.6891) (thickness 0.14224)) (justify left bottom))
+  )
+)

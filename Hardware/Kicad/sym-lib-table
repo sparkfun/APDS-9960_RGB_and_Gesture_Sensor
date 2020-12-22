@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name sparkfun_apds_9960)(type Legacy)(uri ${KIPRJMOD}/sparkfun_apds_9960.lib)(options "")(descr ""))
+)
