@@ -34,6 +34,8 @@ IMPORTANT: The APDS-9960 can only accept 3.3V!
 Resources:
 Include Wire.h and SparkFun_APDS-9960.h
 
+When using Wemos uncomment the two marked lines of code (attachInterrupt).
+
 Development environment specifics:
 Written in Arduino 1.0.5
 Tested with SparkFun Arduino Pro Mini 3.3V
@@ -70,6 +72,8 @@ void setup() {
   Serial.println(F("--------------------------------"));
   
   // Initialize interrupt service routine
+  // uncomment the next line when using Wemos
+  //attachInterrupt(APDS9960_INT, interruptRoutine, FALLING);
   attachInterrupt(0, interruptRoutine, FALLING);
 
   // Initialize APDS-9960 (configure I2C and initial values)
@@ -92,6 +96,8 @@ void loop() {
     detachInterrupt(0);
     handleGesture();
     isr_flag = 0;
+    // uncomment the next line when using Wemos
+    //attachInterrupt(APDS9960_INT, interruptRoutine, FALLING);
     attachInterrupt(0, interruptRoutine, FALLING);
   }
 }
