@@ -2167,7 +2167,7 @@ bool SparkFun_APDS9960::wireReadDataByte(uint8_t reg, uint8_t &val)
     }
 
     /* Read from register */
-    Wire.requestFrom(APDS9960_I2C_ADDR, 1);
+    Wire.requestFrom(APDS9960_I2C_ADDR, (uint8_t) 1);
     while (Wire.available()) {
         val = Wire.read();
     }
@@ -2195,7 +2195,7 @@ int SparkFun_APDS9960::wireReadDataBlock(   uint8_t reg,
     }
 
     /* Read block data */
-    Wire.requestFrom(APDS9960_I2C_ADDR, len);
+    Wire.requestFrom(APDS9960_I2C_ADDR, (uint8_t) len);
     while (Wire.available()) {
         if (i >= len) {
             return -1;
